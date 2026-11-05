@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --bg-linen: #FAF7F2;
+  --bg-card: #FFFFFF;
+  --bg-card-subtle: #F5EFE6;
+  --bg-sidebar: #F2EBE0;
+  
+  --border-subtle: #E8E0D2;
+  --border-strong: #D5C8B4;
+  
+  --text-espresso: #261B14;
+  --text-brown: #544136;
+  --text-muted: #8A776A;
+  
+  --forest-green: #225133;
+  --forest-green-hover: #183C25;
+  --forest-light: #EBF3ED;
+  --sage: #4E7C5D;
+  --sage-light: #DFEDE3;
+  
+  --terracotta: #A4553D;
+  --terracotta-light: #FBEFEB;
+  --amber-gold: #D69736;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: var(--bg-linen);
+  color: var(--text-espresso);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, .font-heading {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-linen);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Ticker marquee horizontal sliding animation */
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: scrollTicker 38s linear infinite;
+}
+
+.ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes scrollTicker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.horizontal-reel::-webkit-scrollbar {
+  display: none;
+}
+
+/* Glass & Card styles */
+.glass-nav {
+  background: rgba(250, 247, 242, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.card-luxury {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(42, 30, 23, 0.04);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-luxury:hover {
+  border-color: var(--border-strong);
+  box-shadow: 0 8px 30px rgba(42, 30, 23, 0.08);
+  transform: translateY(-2px);
+}
+
+/* Button styles */
+.btn-primary {
+  background: var(--forest-green);
+  color: #FAF7F2;
+  border: 1px solid #1A3E26;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(34, 81, 51, 0.25);
+}
+
+.btn-primary:hover {
+  background: var(--forest-green-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(34, 81, 51, 0.35);
+}
+
+.btn-secondary {
+  background: var(--bg-card-subtle);
+  color: var(--text-espresso);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #EFE7DB;
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+}
+
+.badge-green {
+  background: var(--sage-light);
+  color: var(--forest-green);
+  border: 1px solid #C4DCCB;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}

@@ -1,35 +1,32 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Play, Activity, Sparkles, Layers, ArrowUpRight, Gauge, ShieldCheck, Compass } from 'lucide-react';
+import React, { useEffect, useRef } from 'react';
+import { Play, Sparkles, Layers, Compass, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Hero({ onLaunchStudio }) {
   const canvasRef = useRef(null);
-  const [stats, setStats] = useState({ topSpeed: 31.4, possession: 52, activePlayers: 22 });
 
-  // Real-time animated 2D pitch radar canvas
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     let animationFrameId;
 
-    // Pitch standard dimensions
     const width = canvas.width;
     const height = canvas.height;
 
-    // Create 14 simulated players (7 red, 7 blue) and 1 ball
+    // Simulated squads: Orange vs White
     const players = [
-      // Team Alpha (Red/Terracotta)
-      { id: 1, x: width * 0.18, y: height * 0.5, vx: 0.2, vy: 0.1, team: 0, speed: 18.2 },
-      { id: 4, x: width * 0.32, y: height * 0.25, vx: 0.4, vy: -0.2, team: 0, speed: 22.4 },
-      { id: 5, x: width * 0.30, y: height * 0.75, vx: 0.3, vy: 0.2, team: 0, speed: 21.1 },
-      { id: 8, x: width * 0.45, y: height * 0.40, vx: 0.5, vy: 0.1, team: 0, speed: 28.6 },
+      // Team Orange (Attack)
+      { id: 1, x: width * 0.16, y: height * 0.5, vx: 0.1, vy: 0.2, team: 0, speed: 18.2 },
+      { id: 4, x: width * 0.32, y: height * 0.26, vx: 0.4, vy: -0.2, team: 0, speed: 22.4 },
+      { id: 5, x: width * 0.30, y: height * 0.74, vx: 0.3, vy: 0.2, team: 0, speed: 21.1 },
+      { id: 8, x: width * 0.46, y: height * 0.40, vx: 0.5, vy: 0.1, team: 0, speed: 28.6 },
       { id: 10, x: width * 0.48, y: height * 0.65, vx: -0.2, vy: 0.4, team: 0, speed: 26.2 },
-      { id: 7, x: width * 0.60, y: height * 0.30, vx: 0.6, vy: 0.3, team: 0, speed: 32.4 },
-      { id: 9, x: width * 0.62, y: height * 0.70, vx: 0.4, vy: -0.3, team: 0, speed: 29.8 },
+      { id: 7, x: width * 0.62, y: height * 0.30, vx: 0.6, vy: 0.3, team: 0, speed: 34.8 },
+      { id: 9, x: width * 0.64, y: height * 0.70, vx: 0.4, vy: -0.3, team: 0, speed: 29.8 },
 
-      // Team Beta (Forest Teal)
-      { id: 21, x: width * 0.82, y: height * 0.5, vx: -0.2, vy: -0.1, team: 1, speed: 17.5 },
+      // Team White (Defense)
+      { id: 21, x: width * 0.84, y: height * 0.5, vx: -0.1, vy: -0.2, team: 1, speed: 17.5 },
       { id: 14, x: width * 0.68, y: height * 0.28, vx: -0.3, vy: 0.2, team: 1, speed: 23.1 },
       { id: 15, x: width * 0.70, y: height * 0.72, vx: -0.4, vy: -0.2, team: 1, speed: 24.0 },
       { id: 18, x: width * 0.55, y: height * 0.42, vx: -0.5, vy: -0.1, team: 1, speed: 27.5 },
@@ -38,26 +35,25 @@ export default function Hero({ onLaunchStudio }) {
       { id: 17, x: width * 0.38, y: height * 0.68, vx: -0.3, vy: 0.2, team: 1, speed: 28.2 },
     ];
 
-    let ball = { x: width * 0.52, y: height * 0.48, vx: 1.2, vy: 0.6 };
+    let ball = { x: width * 0.52, y: height * 0.48, vx: 1.4, vy: 0.7 };
 
     function drawPitch() {
-      // Background turf in deep tactical green
-      ctx.fillStyle = '#22482E';
+      // Dark realistic grass
+      ctx.fillStyle = '#0D1711';
       ctx.fillRect(0, 0, width, height);
 
-      // Pitch stripes
+      // Grass stripes
       const numStripes = 10;
       const stripeW = width / numStripes;
       for (let i = 0; i < numStripes; i++) {
-        ctx.fillStyle = i % 2 === 0 ? '#1E4029' : '#22482E';
+        ctx.fillStyle = i % 2 === 0 ? '#0B130E' : '#0D1711';
         ctx.fillRect(i * stripeW, 0, stripeW, height);
       }
 
       // Pitch white lines
-      ctx.strokeStyle = 'rgba(235, 245, 238, 0.65)';
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.35)';
       ctx.lineWidth = 1.5;
 
-      // Touchline / Goal lines
       ctx.strokeRect(16, 16, width - 32, height - 32);
 
       // Halfway line & Center circle
@@ -70,7 +66,7 @@ export default function Hero({ onLaunchStudio }) {
       ctx.arc(width / 2, height / 2, 54, 0, Math.PI * 2);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(235, 245, 238, 0.8)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
       ctx.beginPath();
       ctx.arc(width / 2, height / 2, 3, 0, Math.PI * 2);
       ctx.fill();
@@ -96,11 +92,9 @@ export default function Hero({ onLaunchStudio }) {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Bounce within pitch bounds
         if (p.x < 30 || p.x > width - 30) p.vx *= -1;
         if (p.y < 30 || p.y > height - 30) p.vy *= -1;
 
-        // Subtle target pulling toward ball
         const dx = ball.x - p.x;
         const dy = ball.y - p.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
@@ -109,53 +103,51 @@ export default function Hero({ onLaunchStudio }) {
           p.y += (dy / dist) * 0.4;
         }
 
-        // Draw Player circle
-        const teamColor = p.team === 0 ? '#D64933' : '#3BA273';
+        const teamColor = p.team === 0 ? '#FF7E00' : '#FFFFFF';
         
-        // Aura / shadow
+        // Aura
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 9, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(20, 30, 20, 0.4)';
+        ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+        ctx.fillStyle = p.team === 0 ? 'rgba(255, 126, 0, 0.25)' : 'rgba(255, 255, 255, 0.18)';
         ctx.fill();
 
-        // Main dot
+        // Player dot
         ctx.beginPath();
         ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
         ctx.fillStyle = teamColor;
         ctx.fill();
-        ctx.strokeStyle = '#FFFFFF';
+        ctx.strokeStyle = p.team === 0 ? '#FFFFFF' : '#1E293B';
         ctx.lineWidth = 1.5;
         ctx.stroke();
 
-        // Velocity trail vector
+        // Direction vector
         ctx.beginPath();
         ctx.moveTo(p.x, p.y);
-        ctx.lineTo(p.x + p.vx * 14, p.y + p.vy * 14);
+        ctx.lineTo(p.x + p.vx * 15, p.y + p.vy * 15);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Player ID label
-        ctx.fillStyle = '#FFFFFF';
-        ctx.font = '9px "Space Grotesk", sans-serif';
+        // ID label
+        ctx.fillStyle = p.team === 0 ? '#FFFFFF' : '#0F172A';
+        ctx.font = 'bold 9px "Space Grotesk", sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(p.id, p.x, p.y + 3);
       });
 
-      // Update and draw ball
+      // Ball
       ball.x += ball.vx;
       ball.y += ball.vy;
 
       if (ball.x < 24 || ball.x > width - 24) ball.vx *= -0.92;
       if (ball.y < 24 || ball.y > height - 24) ball.vy *= -0.92;
 
-      // Ball glow
       ctx.beginPath();
-      ctx.arc(ball.x, ball.y, 5, 0, Math.PI * 2);
-      ctx.fillStyle = '#FFDD00';
+      ctx.arc(ball.x, ball.y, 5.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#FF7E00';
       ctx.fill();
-      ctx.strokeStyle = '#222222';
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#FFFFFF';
+      ctx.lineWidth = 1.2;
       ctx.stroke();
 
       animationFrameId = requestAnimationFrame(animate);
@@ -170,224 +162,231 @@ export default function Hero({ onLaunchStudio }) {
 
   return (
     <section style={{
-      maxWidth: '1280px',
-      margin: '0 auto',
-      padding: '70px 24px 50px 24px',
-      display: 'grid',
-      gridTemplateColumns: '1.05fr 0.95fr',
-      gap: '48px',
-      alignItems: 'center'
+      position: 'relative',
+      overflow: 'hidden',
+      padding: '90px 48px 80px 48px',
+      background: 'radial-gradient(circle at 50% 20%, rgba(255, 126, 0, 0.08) 0%, rgba(8, 11, 16, 0.95) 70%)'
     }}>
-      {/* Left Column: Value Proposition */}
-      <div>
-        <motion.div 
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+      <div style={{
+        maxWidth: '1360px',
+        margin: '0 auto',
+        display: 'grid',
+        gridTemplateColumns: '1.15fr 0.85fr',
+        gap: '56px',
+        alignItems: 'center'
+      }}>
+        {/* Left Column: Explore. Improve. Win. */}
+        <div>
+          <motion.div 
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="badge-orange" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginBottom: '22px' }}>
+              <Sparkles size={14} />
+              REVOLUTIONIZE SPORTS PERFORMANCE WITH INTELLIGENT ANALYTICS
+            </div>
+
+            <h1 style={{
+              fontSize: '4.6rem',
+              lineHeight: 1.05,
+              fontWeight: 800,
+              color: '#FFFFFF',
+              marginBottom: '16px',
+              letterSpacing: '-1.5px'
+            }}>
+              Explore. Improve. <span className="gradient-text-orange">Win.</span>
+            </h1>
+
+            {/* SportAnalytics Orange Divider Bar */}
+            <div style={{
+              width: '72px',
+              height: '4px',
+              background: 'var(--orange-primary)',
+              borderRadius: '2px',
+              marginBottom: '24px'
+            }} />
+
+            <p style={{
+              fontSize: '1.2rem',
+              lineHeight: 1.65,
+              color: 'var(--text-secondary)',
+              marginBottom: '38px',
+              maxWidth: '580px'
+            }}>
+              Discover the ultimate edge in sports performance with our cutting-edge digital platform, offering comprehensive computer vision and spatial data analytics for soccer and beyond.
+            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '48px' }}>
+              <button 
+                onClick={onLaunchStudio}
+                className="btn-primary" 
+                style={{ fontSize: '1.05rem', padding: '14px 32px' }}
+              >
+                <Play size={18} fill="#FFFFFF" />
+                Explore Platform
+              </button>
+              <a 
+                href="#services"
+                className="btn-secondary"
+                style={{ fontSize: '1.05rem', padding: '14px 28px', textDecoration: 'none' }}
+              >
+                Discover Solutions
+              </a>
+            </div>
+
+            {/* Metric Highlights */}
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(3, 1fr)',
+              gap: '24px',
+              paddingTop: '24px',
+              borderTop: '1px solid var(--border-subtle)'
+            }}>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--orange-primary)', fontFamily: 'Space Grotesk' }}>
+                  800+
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  Tactical & Physical KPIs
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: '#FFFFFF', fontFamily: 'Space Grotesk' }}>
+                  105 × 68m
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  Metric Pitch Plane
+                </div>
+              </div>
+              <div>
+                <div style={{ fontSize: '2rem', fontWeight: 800, color: 'var(--orange-primary)', fontFamily: 'Space Grotesk' }}>
+                  120 FPS
+                </div>
+                <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.8px' }}>
+                  Real-time Edge Latency
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* Right Column: Holographic 2D Tactical Radar Preview */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, delay: 0.15 }}
         >
-          <div className="badge-green" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', marginBottom: '18px' }}>
-            <Sparkles size={14} />
-            NEXT-GEN COMPUTER VISION FOR FOOTBALL ANALYTICS
-          </div>
-
-          <h1 style={{
-            fontSize: '3.3rem',
-            lineHeight: 1.12,
-            fontWeight: 800,
-            color: 'var(--text-espresso)',
-            marginBottom: '20px'
+          <div className="card-luxury" style={{
+            padding: '24px',
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'linear-gradient(180deg, #131A26 0%, #0D121B 100%)',
+            borderColor: 'var(--orange-border)'
           }}>
-            Turn Raw Match Footage Into <span style={{ color: 'var(--forest-green)', position: 'relative' }}>
-              Spatial Intelligence.
-            </span>
-          </h1>
-
-          <p style={{
-            fontSize: '1.14rem',
-            lineHeight: 1.6,
-            color: 'var(--text-brown)',
-            marginBottom: '32px',
-            maxWidth: '560px'
-          }}>
-            Broadcast cameras distort spatial distance. <strong>PITCHLAB</strong> leverages YOLOv8 deep learning and projective homography to extract true player velocity, voronoi space control, and synchronized 2D tactical pitch telemetry in real-time.
-          </p>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginBottom: '40px' }}>
-            <button 
-              onClick={onLaunchStudio}
-              className="btn-primary" 
-              style={{ fontSize: '1.05rem', padding: '13px 28px' }}
-            >
-              <Play size={18} fill="#FAF7F2" />
-              Launch Interactive Studio
-            </button>
-            <a 
-              href="#architecture"
-              className="btn-secondary"
-              style={{ fontSize: '1.05rem', padding: '13px 26px', textDecoration: 'none' }}
-            >
-              <Layers size={18} />
-              View Vision Pipeline
-            </a>
-          </div>
-
-          {/* Quick Stats Grid */}
-          <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: '16px',
-            paddingTop: '20px',
-            borderTop: '1px solid var(--border-subtle)'
-          }}>
-            <div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--forest-green)', fontFamily: 'Space Grotesk' }}>
-                105 × 68m
+            {/* Header */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '16px',
+              paddingBottom: '14px',
+              borderBottom: '1px solid var(--border-subtle)'
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Compass size={20} color="var(--orange-primary)" />
+                <span style={{ fontFamily: 'Space Grotesk', fontWeight: 800, fontSize: '1rem', color: '#FFFFFF', letterSpacing: '0.5px' }}>
+                  SPORTANALYTICS 2D RADAR ENGINE
+                </span>
               </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-                Standard Pitch Calibration
+              <span className="badge-orange" style={{ padding: '3px 10px', fontSize: '0.72rem' }}>
+                LIVE 60 HZ
+              </span>
+            </div>
+
+            {/* Pitch Canvas */}
+            <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border-subtle)', position: 'relative' }}>
+              <canvas 
+                ref={canvasRef} 
+                width={560} 
+                height={360} 
+                style={{ display: 'block', width: '100%', height: 'auto' }}
+              />
+
+              {/* Floating Chips */}
+              <div style={{
+                position: 'absolute',
+                bottom: '14px',
+                left: '14px',
+                display: 'flex',
+                gap: '10px'
+              }}>
+                <div style={{
+                  background: 'rgba(8, 11, 16, 0.92)',
+                  color: '#FFFFFF',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  border: '1px solid var(--orange-border)',
+                  backdropFilter: 'blur(8px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--orange-primary)' }}></span>
+                  TEAM ORANGE: 54%
+                </div>
+                <div style={{
+                  background: 'rgba(8, 11, 16, 0.92)',
+                  color: '#FFFFFF',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  border: '1px solid var(--border-subtle)',
+                  backdropFilter: 'blur(8px)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#FFFFFF' }}></span>
+                  TEAM WHITE: 46%
+                </div>
+              </div>
+
+              <div style={{
+                position: 'absolute',
+                top: '14px',
+                right: '14px',
+                background: 'rgba(8, 11, 16, 0.92)',
+                color: 'var(--orange-primary)',
+                padding: '7px 14px',
+                borderRadius: '8px',
+                fontSize: '0.82rem',
+                fontWeight: 800,
+                fontFamily: 'Space Grotesk',
+                border: '1px solid var(--orange-border)',
+                backdropFilter: 'blur(8px)'
+              }}>
+                PEAK SPRINT: 34.8 KM/H
               </div>
             </div>
-            <div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--terracotta)', fontFamily: 'Space Grotesk' }}>
-                &lt; 15 ms
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-                RTX 4050 Latency
-              </div>
-            </div>
-            <div>
-              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-espresso)', fontFamily: 'Space Grotesk' }}>
-                98.4%
-              </div>
-              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>
-                Player ID Persistence
-              </div>
+
+            <div style={{
+              marginTop: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              fontSize: '0.84rem',
+              color: 'var(--text-muted)'
+            }}>
+              <span>Standard Metric Projection (105.0m × 68.0m)</span>
+              <span style={{ color: 'var(--orange-primary)', fontWeight: 700 }}>Optical Homography Matrix</span>
             </div>
           </div>
         </motion.div>
       </div>
-
-      {/* Right Column: Holographic 2D Tactical Radar Preview */}
-      <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.6, delay: 0.15 }}
-      >
-        <div className="card-luxury" style={{
-          padding: '20px',
-          position: 'relative',
-          overflow: 'hidden',
-          background: '#FDFBF7'
-        }}>
-          {/* Top Bar of Holographic Widget */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            marginBottom: '16px',
-            paddingBottom: '12px',
-            borderBottom: '1px solid var(--border-subtle)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Compass size={18} color="var(--forest-green)" />
-              <span style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '0.95rem' }}>
-                2D TACTICAL RADAR TELEMETRY
-              </span>
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{
-                fontSize: '0.75rem',
-                fontWeight: 700,
-                color: 'var(--forest-green)',
-                background: 'var(--forest-light)',
-                padding: '3px 8px',
-                borderRadius: '6px'
-              }}>
-                LIVE 60 FPS
-              </span>
-            </div>
-          </div>
-
-          {/* Interactive Animated Pitch Canvas */}
-          <div style={{ borderRadius: '12px', overflow: 'hidden', border: '1px solid #1A3E26', position: 'relative' }}>
-            <canvas 
-              ref={canvasRef} 
-              width={540} 
-              height={350} 
-              style={{ display: 'block', width: '100%', height: 'auto' }}
-            />
-
-            {/* Floating Telemetry Chips */}
-            <div style={{
-              position: 'absolute',
-              bottom: '12px',
-              left: '12px',
-              display: 'flex',
-              gap: '8px'
-            }}>
-              <div style={{
-                background: 'rgba(28, 20, 16, 0.85)',
-                color: '#FAF7F2',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#D64933' }}></span>
-                ALPHA: 54%
-              </div>
-              <div style={{
-                background: 'rgba(28, 20, 16, 0.85)',
-                color: '#FAF7F2',
-                padding: '6px 12px',
-                borderRadius: '6px',
-                fontSize: '0.75rem',
-                fontWeight: 600,
-                backdropFilter: 'blur(4px)',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px'
-              }}>
-                <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#3BA273' }}></span>
-                BETA: 46%
-              </div>
-            </div>
-
-            <div style={{
-              position: 'absolute',
-              top: '12px',
-              right: '12px',
-              background: 'rgba(28, 20, 16, 0.85)',
-              color: '#00E676',
-              padding: '6px 12px',
-              borderRadius: '6px',
-              fontSize: '0.78rem',
-              fontWeight: 700,
-              fontFamily: 'Space Grotesk',
-              backdropFilter: 'blur(4px)'
-            }}>
-              PEAK SPRINT: 32.4 KM/H
-            </div>
-          </div>
-
-          {/* Under-canvas Caption */}
-          <div style={{
-            marginTop: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            fontSize: '0.82rem',
-            color: 'var(--text-muted)'
-          }}>
-            <span>Metric Space Projection (0.0 - 105.0m, 0.0 - 68.0m)</span>
-            <span style={{ color: 'var(--forest-green)', fontWeight: 600 }}>Zero Perspective Distortion</span>
-          </div>
-        </div>
-      </motion.div>
     </section>
   );
 }

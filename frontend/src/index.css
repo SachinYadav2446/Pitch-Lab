@@ -1,27 +1,34 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap');
 
 :root {
-  --bg-linen: #FAF7F2;
-  --bg-card: #FFFFFF;
-  --bg-card-subtle: #F5EFE6;
-  --bg-sidebar: #F2EBE0;
+  /* SportAnalytics Pro Theme: Obsidian Black, Pure White, Vibrant Electric Orange */
+  --bg-dark: #080B10;
+  --bg-dark-secondary: #0D1118;
+  --bg-card: #121722;
+  --bg-card-hover: #18202D;
+  --bg-card-subtle: #151C28;
   
-  --border-subtle: #E8E0D2;
-  --border-strong: #D5C8B4;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-medium: rgba(255, 255, 255, 0.15);
+  --border-accent: rgba(255, 126, 0, 0.35);
   
-  --text-espresso: #261B14;
-  --text-brown: #544136;
-  --text-muted: #8A776A;
+  --text-white: #FFFFFF;
+  --text-primary: #F8FAFC;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
   
-  --forest-green: #225133;
-  --forest-green-hover: #183C25;
-  --forest-light: #EBF3ED;
-  --sage: #4E7C5D;
-  --sage-light: #DFEDE3;
+  /* Primary Signature Orange (from sportanalyticspro.com) */
+  --orange-primary: #FF7E00;
+  --orange-hover: #E66F00;
+  --orange-glow: rgba(255, 126, 0, 0.35);
+  --orange-subtle: rgba(255, 126, 0, 0.12);
+  --orange-border: rgba(255, 126, 0, 0.28);
   
-  --terracotta: #A4553D;
-  --terracotta-light: #FBEFEB;
-  --amber-gold: #D69736;
+  /* Supporting Neutral & Pitch tones */
+  --pitch-dark: #121F17;
+  --pitch-stripe: #0E1A13;
+  --team-orange: #FF7E00;
+  --team-white: #FFFFFF;
 }
 
 * {
@@ -32,58 +39,63 @@
 
 body {
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  background-color: var(--bg-linen);
-  color: var(--text-espresso);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, .font-heading {
+h1, h2, h3, h4, h5, .font-heading {
   font-family: 'Space Grotesk', sans-serif;
   letter-spacing: -0.02em;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-linen);
+  background: var(--bg-dark);
 }
 ::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
+  background: #1E293B;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--text-muted);
+  background: var(--orange-primary);
 }
 
-/* Ticker marquee horizontal sliding animation */
+/* Animations */
+@keyframes scrollTicker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes pulseOrange {
+  0%, 100% { box-shadow: 0 0 15px rgba(255, 126, 0, 0.2); }
+  50% { box-shadow: 0 0 30px rgba(255, 126, 0, 0.45); }
+}
+
 .ticker-track {
   display: flex;
   width: max-content;
-  animation: scrollTicker 38s linear infinite;
+  animation: scrollTicker 45s linear infinite;
 }
 
 .ticker-track:hover {
   animation-play-state: paused;
 }
 
-@keyframes scrollTicker {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
-
 .horizontal-reel::-webkit-scrollbar {
   display: none;
 }
 
-/* Glass & Card styles */
+/* Glassmorphism & Card Styles */
 .glass-nav {
-  background: rgba(250, 247, 242, 0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(8, 11, 16, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -91,66 +103,90 @@ h1, h2, h3, h4, .font-heading {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(42, 30, 23, 0.04);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
   transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .card-luxury:hover {
-  border-color: var(--border-strong);
-  box-shadow: 0 8px 30px rgba(42, 30, 23, 0.08);
+  border-color: var(--border-accent);
+  background: var(--bg-card-hover);
+  box-shadow: 0 16px 45px rgba(0, 0, 0, 0.6);
   transform: translateY(-2px);
 }
 
-/* Button styles */
+/* High-Impact Orange Button */
 .btn-primary {
-  background: var(--forest-green);
-  color: #FAF7F2;
-  border: 1px solid #1A3E26;
+  background: linear-gradient(135deg, #FF7E00 0%, #E66F00 100%);
+  color: #FFFFFF;
+  border: 1px solid #FF7E00;
   border-radius: 10px;
-  font-weight: 600;
-  padding: 10px 22px;
+  font-weight: 700;
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: 0.3px;
+  padding: 12px 26px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(34, 81, 51, 0.25);
+  box-shadow: 0 4px 20px var(--orange-glow);
 }
 
 .btn-primary:hover {
-  background: var(--forest-green-hover);
+  background: linear-gradient(135deg, #FF9100 0%, #FF7E00 100%);
   transform: translateY(-1px);
-  box-shadow: 0 4px 14px rgba(34, 81, 51, 0.35);
+  box-shadow: 0 6px 28px rgba(255, 126, 0, 0.5);
 }
 
 .btn-secondary {
-  background: var(--bg-card-subtle);
-  color: var(--text-espresso);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-white);
   border: 1px solid var(--border-subtle);
   border-radius: 10px;
   font-weight: 600;
-  padding: 10px 22px;
+  padding: 12px 24px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
   transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
 }
 
 .btn-secondary:hover {
-  background: #EFE7DB;
-  border-color: var(--border-strong);
+  background: rgba(255, 255, 255, 0.09);
+  border-color: var(--border-medium);
   transform: translateY(-1px);
 }
 
-.badge-green {
-  background: var(--sage-light);
-  color: var(--forest-green);
-  border: 1px solid #C4DCCB;
-  padding: 4px 12px;
+/* Badges */
+.badge-orange {
+  background: var(--orange-subtle);
+  color: var(--orange-primary);
+  border: 1px solid var(--orange-border);
+  padding: 5px 14px;
   border-radius: 20px;
   font-size: 0.75rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
+  letter-spacing: 1px;
+}
+
+.badge-neutral {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Gradient text */
+.gradient-text-orange {
+  background: linear-gradient(135deg, #FF7E00 0%, #FFA834 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

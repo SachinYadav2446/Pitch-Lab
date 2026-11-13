@@ -15,9 +15,9 @@ export default function TacticalReel() {
       stat: "Pressing Intensity: 4.8 PPDA",
       metricName: "Defensive Line Height",
       metricVal: "48.2m",
-      description: "Team Alpha triggers an aggressive 3-player pressing trap on the touchline, cutting off the passing lane and forcing a turnover.",
+      description: "Team triggers an aggressive 3-player pressing trap on the touchline, cutting off the inside passing lane and forcing an immediate turnover.",
       badge: "Turnover Created",
-      accent: "#245235"
+      accent: "var(--pitch-green)"
     },
     {
       id: "moment-2",
@@ -26,10 +26,10 @@ export default function TacticalReel() {
       type: "Sprint Acceleration",
       stat: "Peak Sprint: 34.8 km/h",
       metricName: "Transition Velocity",
-      metricVal: "8.2 m/s",
-      description: "Instant vertical progression. Player #7 accelerates into open space with a 45-meter sprint, outpacing the defensive recovery.",
+      metricVal: "8.4 m/s",
+      description: "Instant vertical progression. Player accelerates into space with a 45-meter sprint, completely outrunning the opponent's recovery line.",
       badge: "High-Intensity Sprint",
-      accent: "#D64933"
+      accent: "var(--electric-amber)"
     },
     {
       id: "moment-3",
@@ -39,9 +39,9 @@ export default function TacticalReel() {
       stat: "Space Controlled: 64.2%",
       metricName: "Pass Triangle Width",
       metricVal: "18.4m",
-      description: "Midfield overload creating a numerical superiority (+1) in the half-space to penetrate the opponent's low defensive block.",
+      description: "Midfield overload creating a numerical superiority (+1) in the left half-space to penetrate the opponent's structured low defensive block.",
       badge: "Numerical Superiority",
-      accent: "#3B7A50"
+      accent: "var(--azure-blue)"
     },
     {
       id: "moment-4",
@@ -51,66 +51,63 @@ export default function TacticalReel() {
       stat: "Team Length: 24.1m",
       metricName: "Line Separation",
       metricVal: "9.2m",
-      description: "Defending deep inside the final third. Synchronized movement between midfield and defensive lines denies pocket passes.",
+      description: "Defending deep inside the final third. Synchronized movement between midfield and defensive lines denies pocket passes between the lines.",
       badge: "Low-Block Structure",
-      accent: "#A65A42"
+      accent: "#EF4444"
     }
   ];
 
   const handleScroll = (direction) => {
     if (scrollContainerRef.current) {
-      const scrollAmount = direction === 'left' ? -380 : 380;
+      const scrollAmount = direction === 'left' ? -400 : 400;
       scrollContainerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
   return (
     <section style={{
-      maxWidth: '1280px',
-      margin: '80px auto',
-      padding: '0 24px'
+      maxWidth: '1360px',
+      margin: '90px auto',
+      padding: '0 40px'
     }}>
-      {/* Section Header with Left/Right Horizontal Scroll Controls */}
       <div style={{
         display: 'flex',
         alignItems: 'flex-end',
         justifyContent: 'space-between',
-        marginBottom: '28px',
+        marginBottom: '32px',
         flexWrap: 'wrap',
-        gap: '16px'
+        gap: '20px'
       }}>
         <div>
-          <span className="badge-green">Horizontal Match Reel</span>
-          <h2 style={{ fontSize: '2.5rem', color: 'var(--text-espresso)', marginTop: '8px', marginBottom: '8px' }}>
-            Tactical Match Phases & Spatial Telemetry
+          <span className="badge-amber">Match Phase Telemetry Reel</span>
+          <h2 style={{ fontSize: '3rem', color: '#FFFFFF', marginTop: '12px', marginBottom: '8px', letterSpacing: '-1px' }}>
+            Tactical Scenarios & Spatial Shifts
           </h2>
-          <p style={{ fontSize: '1.05rem', color: 'var(--text-brown)', margin: 0 }}>
-            Slide horizontally across key match phases to inspect spatial dynamics and telemetry shifts.
+          <p style={{ fontSize: '1.14rem', color: 'var(--text-secondary)', margin: 0 }}>
+            Slide horizontally across match phases to inspect team shape, line separation, and kinematic load.
           </p>
         </div>
 
-        {/* Scroll Buttons */}
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '12px' }}>
           <button 
             onClick={() => handleScroll('left')}
             className="btn-secondary"
-            style={{ width: '42px', height: '42px', padding: 0, justifyContent: 'center', borderRadius: '50%' }}
-            aria-label="Previous Tactical Phase"
+            style={{ width: '46px', height: '46px', padding: 0, justifyContent: 'center', borderRadius: '50%' }}
+            aria-label="Previous Phase"
           >
             <ChevronLeft size={20} />
           </button>
           <button 
             onClick={() => handleScroll('right')}
             className="btn-primary"
-            style={{ width: '42px', height: '42px', padding: 0, justifyContent: 'center', borderRadius: '50%' }}
-            aria-label="Next Tactical Phase"
+            style={{ width: '46px', height: '46px', padding: 0, justifyContent: 'center', borderRadius: '50%' }}
+            aria-label="Next Phase"
           >
             <ChevronRight size={20} />
           </button>
         </div>
       </div>
 
-      {/* Horizontal Sliding Card Reel Container */}
       <div 
         ref={scrollContainerRef}
         className="horizontal-reel"
@@ -130,16 +127,16 @@ export default function TacticalReel() {
             <motion.div
               key={m.id}
               onClick={() => setSelectedIdx(idx)}
-              whileHover={{ y: -4 }}
+              whileHover={{ y: -6 }}
               style={{
-                flex: '0 0 380px',
+                flex: '0 0 400px',
                 scrollSnapAlign: 'start',
-                background: isSelected ? '#FFFFFF' : 'var(--bg-card-subtle)',
+                background: isSelected ? 'var(--bg-card-hover)' : 'var(--bg-card)',
                 border: isSelected ? `2px solid ${m.accent}` : '1px solid var(--border-subtle)',
                 borderRadius: '18px',
-                padding: '28px',
+                padding: '32px',
                 cursor: 'pointer',
-                boxShadow: isSelected ? '0 12px 30px rgba(40, 30, 20, 0.08)' : '0 2px 8px rgba(40, 30, 20, 0.02)',
+                boxShadow: isSelected ? '0 12px 40px rgba(0, 0, 0, 0.6)' : '0 4px 16px rgba(0, 0, 0, 0.3)',
                 transition: 'all 0.3s ease',
                 display: 'flex',
                 flexDirection: 'column',
@@ -147,57 +144,57 @@ export default function TacticalReel() {
               }}
             >
               <div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
-                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: m.accent, letterSpacing: '1px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: m.accent, letterSpacing: '1px' }}>
                     {m.phase}
                   </span>
                   <span style={{
                     fontSize: '0.72rem',
-                    fontWeight: 700,
-                    padding: '3px 10px',
+                    fontWeight: 800,
+                    padding: '4px 10px',
                     borderRadius: '12px',
-                    background: 'var(--forest-light)',
-                    color: 'var(--forest-green)'
+                    background: 'rgba(255, 255, 255, 0.05)',
+                    border: '1px solid var(--border-subtle)',
+                    color: '#FFFFFF'
                   }}>
                     {m.badge}
                   </span>
                 </div>
 
-                <h3 style={{ fontSize: '1.35rem', color: 'var(--text-espresso)', marginBottom: '8px' }}>
+                <h3 style={{ fontSize: '1.45rem', color: '#FFFFFF', marginBottom: '10px', letterSpacing: '-0.3px' }}>
                   {m.title}
                 </h3>
 
-                <p style={{ fontSize: '0.92rem', lineHeight: 1.6, color: 'var(--text-brown)', marginBottom: '20px' }}>
+                <p style={{ fontSize: '0.96rem', lineHeight: 1.65, color: 'var(--text-secondary)', marginBottom: '24px' }}>
                   {m.description}
                 </p>
               </div>
 
-              {/* Metric Highlight Footer */}
               <div style={{
                 borderTop: '1px solid var(--border-subtle)',
-                paddingTop: '16px',
+                paddingTop: '20px',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'baseline'
               }}>
                 <div>
-                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>
+                  <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
                     {m.metricName}
                   </div>
-                  <div style={{ fontSize: '1.4rem', fontWeight: 800, color: m.accent, fontFamily: 'Space Grotesk' }}>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 800, color: m.accent, fontFamily: 'Space Grotesk' }}>
                     {m.metricVal}
                   </div>
                 </div>
 
                 <div style={{
-                  fontSize: '0.82rem',
+                  fontSize: '0.85rem',
                   fontWeight: 700,
-                  color: 'var(--forest-green)',
+                  color: m.accent,
                   display: 'flex',
                   alignItems: 'center',
                   gap: '4px'
                 }}>
-                  Inspect Telemetry <ArrowRight size={14} />
+                  Inspect Telemetry <ArrowRight size={15} />
                 </div>
               </div>
             </motion.div>

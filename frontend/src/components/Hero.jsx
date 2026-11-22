@@ -27,6 +27,7 @@ export default function Hero({ onLaunchStudio }) {
       }}>
         {/* ========================================================
             LEFT SIDE CONTENT AREA (To the left of the vertical section)
+            Brand Name + Subheading + Description + Button
             ======================================================== */}
         <div style={{
           flex: 1,
@@ -37,29 +38,33 @@ export default function Hero({ onLaunchStudio }) {
           justifyContent: 'center',
           maxWidth: '640px'
         }}>
-          {/* Main Headline in Deep Burgundy #590907 */}
+          {/* 1. Main Project / Brand Name */}
           <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: 'clamp(2.5rem, 4.2vw, 3.9rem)',
+            fontSize: 'clamp(3.2rem, 5.6vw, 5rem)',
             fontWeight: 800,
-            lineHeight: 1.08,
-            letterSpacing: '-0.035em',
+            lineHeight: 1.02,
+            letterSpacing: '-0.04em',
             color: 'var(--burgundy-deep)',
-            marginBottom: '20px'
+            marginBottom: '14px'
           }}>
-            Autonomous Spatial<br />
-            <span style={{
-              color: 'var(--burgundy-deep)',
-              textDecoration: 'underline',
-              textUnderlineOffset: '10px',
-              textDecorationThickness: '3.5px',
-              textDecorationColor: 'rgba(89, 9, 7, 0.4)'
-            }}>
-              Intelligence
-            </span> for Elite Football.
+            pitchvision<span style={{ opacity: 0.6 }}>.ai</span>
           </h1>
 
-          {/* Subtitle Paragraph */}
+          {/* 2. Subheading Below Name */}
+          <p style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
+            fontWeight: 700,
+            lineHeight: 1.3,
+            letterSpacing: '-0.02em',
+            color: 'var(--burgundy-deep)',
+            marginBottom: '18px'
+          }}>
+            Autonomous Spatial Intelligence for Elite Football.
+          </p>
+
+          {/* 3. Subtitle / Descriptive Paragraph */}
           <p style={{
             fontSize: '1.02rem',
             lineHeight: 1.65,
@@ -72,7 +77,7 @@ export default function Hero({ onLaunchStudio }) {
             planar pitch homography, and real-time physical performance telemetry in &lt;16 ms.
           </p>
 
-          {/* Action Button */}
+          {/* 4. Action Button */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -94,17 +99,14 @@ export default function Hero({ onLaunchStudio }) {
         </div>
 
         {/* ========================================================
-            LEANED DEEP BURGUNDY VERTICAL SECTION
-            - Shifted a bit in right (marginRight: 190px)
-            - Width: 440px
-            - Extends from Top of Screen (including Navbar) to Bottom
+            LEANED DEEP BURGUNDY VERTICAL SECTION (UNTOUCHED)
             ======================================================== */}
         <div style={{
           position: 'relative',
           width: '440px',
           minWidth: '380px',
           height: '100%',
-          marginRight: '190px', // Shifted a bit to the right as requested
+          marginRight: '190px',
           zIndex: 5
         }}>
           {/* Angled Deep Burgundy Slab (#590907) Slicing from Top to Bottom */}
@@ -142,7 +144,7 @@ export default function Hero({ onLaunchStudio }) {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-            {/* Empty interior ready for next element */}
+            {/* Clean interior ready for next element */}
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, Menu, X, Radio } from 'lucide-react';
+import { ArrowRight, Menu, X } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,81 +17,51 @@ export default function Navbar({ onLaunchStudio }) {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      padding: '18px 44px',
+      padding: '10px 40px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       border: 'none',
-      borderBottom: '1px solid rgba(89, 9, 7, 0.08)',
+      borderBottom: 'none',
       boxShadow: 'none'
     }}>
-      {/* ========================================================
-          LEFT-CENTERED NAVIGATION GROUP
-          Three Lines Menu Icon + 3 Live Badge + Left-Centered Links
-          ======================================================== */}
+      {/* Left-Centered Navigation Group */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '20px'
+        gap: '24px'
       }}>
-        {/* Three Lines (Hamburger Menu Icon) */}
+        {/* Three Lines Menu Icon */}
         <button
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           style={{
-            background: 'rgba(89, 9, 7, 0.08)',
-            border: '1px solid rgba(89, 9, 7, 0.15)',
-            borderRadius: '10px',
+            background: 'transparent',
+            border: 'none',
             color: 'var(--burgundy-deep)',
             cursor: 'pointer',
-            padding: '7px 9px',
+            padding: '4px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'all 0.2s ease'
+            borderRadius: '6px',
+            transition: 'opacity 0.2s ease'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(89, 9, 7, 0.16)'}
-          onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(89, 9, 7, 0.08)'}
+          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
           aria-label="Toggle Navigation Menu"
         >
           {mobileMenuOpen ? (
-            <X size={20} color="var(--burgundy-deep)" strokeWidth={2.5} />
+            <X size={18} color="var(--burgundy-deep)" strokeWidth={2.4} />
           ) : (
-            <Menu size={20} color="var(--burgundy-deep)" strokeWidth={2.5} />
+            <Menu size={18} color="var(--burgundy-deep)" strokeWidth={2.4} />
           )}
         </button>
 
-        {/* 3 LIVE Indicator Badge on Left Side */}
+        {/* Left-Centered Nav Links (Reduced Size: 0.80rem) */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '6px',
-          padding: '5px 12px',
-          borderRadius: '20px',
-          background: 'rgba(89, 9, 7, 0.12)',
-          border: '1px solid rgba(89, 9, 7, 0.22)',
-          fontSize: '0.74rem',
-          fontWeight: 800,
-          color: 'var(--burgundy-deep)',
-          letterSpacing: '0.6px'
-        }}>
-          <span style={{
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            backgroundColor: '#590907',
-            boxShadow: '0 0 8px rgba(89, 9, 7, 0.6)',
-            display: 'inline-block'
-          }} />
-          <Radio size={12} color="var(--burgundy-deep)" />
-          <span>3 LIVE</span>
-        </div>
-
-        {/* Left-Centered Navigation Links */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '32px',
-          marginLeft: '8px'
+          gap: '28px'
         }} className="hidden-mobile">
           {navLinks.map((link) => (
             <a
@@ -100,7 +70,7 @@ export default function Navbar({ onLaunchStudio }) {
               style={{
                 textDecoration: 'none',
                 color: 'var(--burgundy-deep)',
-                fontSize: '0.92rem',
+                fontSize: '0.80rem',
                 fontWeight: 700,
                 letterSpacing: '0.2px',
                 opacity: 0.88,
@@ -109,12 +79,10 @@ export default function Navbar({ onLaunchStudio }) {
               onMouseEnter={(e) => {
                 e.target.style.opacity = '1';
                 e.target.style.color = '#380504';
-                e.target.style.textShadow = '0 0 10px rgba(89, 9, 7, 0.25)';
               }}
               onMouseLeave={(e) => {
                 e.target.style.opacity = '0.88';
                 e.target.style.color = 'var(--burgundy-deep)';
-                e.target.style.textShadow = 'none';
               }}
             >
               {link.label}
@@ -123,29 +91,27 @@ export default function Navbar({ onLaunchStudio }) {
         </div>
       </div>
 
-      {/* ========================================================
-          RIGHT SIDE: Tactical Console CTA Button
-          ======================================================== */}
+      {/* Right Action: Reduced Compact CTA Button (0.78rem) */}
       <div style={{
         display: 'flex',
-        alignItems: 'center',
-        gap: '12px'
+        alignItems: 'center'
       }}>
         <button
           onClick={onLaunchStudio}
           className="btn-burgundy-primary"
           style={{
-            borderRadius: '24px',
-            padding: '9px 24px',
-            fontSize: '0.86rem'
+            borderRadius: '20px',
+            padding: '7px 18px',
+            fontSize: '0.78rem',
+            border: 'none'
           }}
         >
           <span>Tactical Console</span>
-          <ArrowRight size={14} color="var(--cream-beige)" />
+          <ArrowRight size={13} color="var(--cream-beige)" />
         </button>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div style={{
           position: 'absolute',
@@ -154,12 +120,12 @@ export default function Navbar({ onLaunchStudio }) {
           right: 0,
           background: 'rgba(165, 167, 155, 0.98)',
           backdropFilter: 'blur(20px)',
-          padding: '24px',
+          padding: '20px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '18px',
-          borderBottom: '1px solid rgba(89, 9, 7, 0.15)',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.15)'
+          gap: '16px',
+          border: 'none',
+          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)'
         }}>
           {navLinks.map((link) => (
             <a
@@ -169,7 +135,7 @@ export default function Navbar({ onLaunchStudio }) {
               style={{
                 textDecoration: 'none',
                 color: 'var(--burgundy-deep)',
-                fontSize: '1.05rem',
+                fontSize: '0.95rem',
                 fontWeight: 700
               }}
             >
@@ -183,14 +149,15 @@ export default function Navbar({ onLaunchStudio }) {
             }}
             className="btn-burgundy-primary"
             style={{
-              borderRadius: '24px',
-              padding: '12px 24px',
-              fontSize: '0.92rem',
-              justifyContent: 'center'
+              borderRadius: '20px',
+              padding: '10px 20px',
+              fontSize: '0.85rem',
+              justifyContent: 'center',
+              border: 'none'
             }}
           >
             <span>Tactical Console</span>
-            <ArrowRight size={14} color="var(--cream-beige)" />
+            <ArrowRight size={13} color="var(--cream-beige)" />
           </button>
         </div>
       )}

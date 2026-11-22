@@ -75,13 +75,14 @@ h1, h2, h3, h4, h5, .font-heading {
   background: var(--burgundy-deep);
 }
 
-/* Clean Floating Navigation in Muted Sage Glass */
+/* Clean Floating Navigation (Completely Borderless & Compact) */
 .glass-nav {
-  background: rgba(165, 167, 155, 0.85);
+  background: rgba(165, 167, 155, 0.88);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: none;
-  border-bottom: 1px solid rgba(89, 9, 7, 0.08);
+  border: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
 }
 
 /* Primary Button: Deep Burgundy with Warm Cream Beige Text */

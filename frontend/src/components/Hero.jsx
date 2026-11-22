@@ -5,94 +5,105 @@ export default function Hero({ onLaunchStudio }) {
     <section style={{
       position: 'relative',
       width: '100%',
-      maxWidth: '1440px',
-      margin: '0 auto',
-      padding: '32px 48px 60px',
-      minHeight: 'calc(100vh - 65px)',
+      minHeight: 'calc(100vh - 54px)', // Spans top to bottom directly under navbar
+      height: 'calc(100vh - 54px)',
       display: 'flex',
-      alignItems: 'center',
+      alignItems: 'stretch',
+      overflow: 'hidden',
+      backgroundColor: 'var(--bg-sage)',
       boxSizing: 'border-box'
     }}>
-      {/* 3-Part Layout Container */}
+      {/* 3-Part Grid Container */}
       <div style={{
+        position: 'relative',
         width: '100%',
+        maxWidth: '1440px',
+        margin: '0 auto',
         display: 'flex',
-        alignItems: 'center',
+        alignItems: 'stretch',
         justifyContent: 'space-between',
-        gap: '40px'
+        height: '100%'
       }}>
-        {/* Left Side Space (Reserved for the other two parts) */}
+        {/* Left Side Space (Reserved for the remaining 2 parts) */}
         <div style={{
           flex: 1,
-          display: 'flex',
-          flexDirection: 'column'
-        }}>
-          {/* Space reserved for remaining sections */}
-        </div>
-
-        {/* Vertical Section: Leaning to the right side with generous width */}
-        <div style={{
-          width: '500px',
-          minWidth: '440px',
-          height: '620px',
-          borderRadius: '26px',
-          background: 'var(--cream-beige)',
-          border: '1.5px solid rgba(89, 9, 7, 0.22)',
-          boxShadow: '0 16px 45px rgba(89, 9, 7, 0.12)',
+          zIndex: 10,
+          padding: '48px',
           display: 'flex',
           flexDirection: 'column',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.3s ease'
+          justifyContent: 'center'
         }}>
-          {/* Clean Top Bar of the Vertical Box */}
-          <div style={{
-            padding: '16px 24px',
-            borderBottom: '1px solid rgba(89, 9, 7, 0.12)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            background: 'rgba(232, 210, 181, 0.5)'
-          }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <span style={{
-                width: '8px',
-                height: '8px',
-                borderRadius: '50%',
-                backgroundColor: 'var(--burgundy-deep)'
-              }} />
-              <span style={{
-                fontFamily: 'Space Grotesk, sans-serif',
-                fontSize: '0.80rem',
-                fontWeight: 800,
-                color: 'var(--burgundy-deep)',
-                letterSpacing: '0.6px',
-                textTransform: 'uppercase'
-              }}>
-                Vertical Section
-              </span>
-            </div>
+          {/* Space reserved for Part 1 & Part 2 */}
+        </div>
 
-            <span style={{
-              fontSize: '0.72rem',
-              fontWeight: 700,
-              color: 'var(--burgundy-deep)',
-              opacity: 0.6
-            }}>
-              500px × 620px
-            </span>
+        {/* Leaned Deep Burgundy Vertical Section (Spans Top to Bottom, angled) */}
+        <div style={{
+          position: 'relative',
+          width: '520px',
+          minWidth: '460px',
+          height: '100%',
+          marginRight: '60px', // Leaning towards the right side of screen
+          zIndex: 5
+        }}>
+          {/* Angled Deep Burgundy Slab (#590907) */}
+          <div style={{
+            position: 'absolute',
+            top: '-20px',
+            bottom: '-20px',
+            left: 0,
+            right: 0,
+            background: 'linear-gradient(175deg, #590907 0%, #430504 100%)',
+            transform: 'skewX(-11deg)', // Dynamic slant/lean
+            transformOrigin: 'top center',
+            boxShadow: '-14px 0 35px rgba(0, 0, 0, 0.22), 0 0 25px rgba(89, 9, 7, 0.2)',
+            borderLeft: '1.5px solid rgba(232, 210, 181, 0.3)',
+            borderRight: '1px solid rgba(232, 210, 181, 0.15)'
+          }}>
+            {/* Subtle high-tech diagonal accent line */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: '20px',
+              width: '1px',
+              background: 'linear-gradient(to bottom, transparent, rgba(232, 210, 181, 0.15), transparent)'
+            }} />
           </div>
 
-          {/* Internal Canvas Area */}
+          {/* Content Container inside the Burgundy section (Un-skewed) */}
           <div style={{
-            flex: 1,
-            padding: '28px',
+            position: 'relative',
+            zIndex: 6,
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            padding: '48px 36px',
+            color: 'var(--cream-beige)'
           }}>
-            {/* Ready for content */}
+            {/* Content area ready for Part 3 */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '6px 14px',
+              borderRadius: '20px',
+              background: 'rgba(232, 210, 181, 0.12)',
+              border: '1px solid rgba(232, 210, 181, 0.25)',
+              fontSize: '0.74rem',
+              fontWeight: 800,
+              letterSpacing: '0.6px',
+              textTransform: 'uppercase'
+            }}>
+              <span style={{
+                width: '6px',
+                height: '6px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--cream-beige)'
+              }} />
+              <span>Burgundy Vertical Section</span>
+            </div>
           </div>
         </div>
       </div>

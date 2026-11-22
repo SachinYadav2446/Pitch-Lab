@@ -100,7 +100,7 @@ export default function StudioPage({ onBackToHome }) {
   };
 
   // Start analysis on uploaded video or demo match
-  const handleStartAnalysis = async (useDemo = false) => {
+  const handleStartAnalysis = async (useDemo = false, demoClip = 'match_broadcast_demo.mp4') => {
     setErrorMessage(null);
     setPageState('processing');
     setProgress(0);
@@ -114,10 +114,11 @@ export default function StudioPage({ onBackToHome }) {
       if (useDemo || !selectedFile) {
         endpoint = `${API_BASE}/api/analyze-demo`;
         const formData = new FormData();
+        formData.append('clip_name', demoClip);
         formData.append('max_frames', maxFrames.toString());
         bodyData = formData;
-        setVideoFileName('sample_match.mp4');
-        setVideoUrl('/sample_match.mp4');
+        setVideoFileName(demoClip);
+        setVideoUrl(`/${demoClip}`);
       } else {
         const formData = new FormData();
         formData.append('file', selectedFile);
@@ -870,37 +871,84 @@ export default function StudioPage({ onBackToHome }) {
 
             {/* Quick Demo Match Fallback Option */}
             <div style={{
-              marginTop: '20px',
+              marginTop: '22px',
               paddingTop: '20px',
               borderTop: '1px solid rgba(232, 210, 181, 0.15)',
               width: '100%',
               display: 'flex',
+              flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '12px'
+              gap: '10px'
             }}>
-              <span style={{ fontSize: '0.76rem', color: 'rgba(232, 210, 181, 0.7)' }}>
-                Don't have a match recording ready?
+              <span style={{ fontSize: '0.74rem', color: 'rgba(232, 210, 181, 0.7)', textTransform: 'uppercase', letterSpacing: '0.05em', fontWeight: 600 }}>
+                Or test instantly with pre-downloaded broadcast clips:
               </span>
-              <button
-                onClick={() => handleStartAnalysis(true)}
-                style={{
-                  backgroundColor: 'rgba(232, 210, 181, 0.15)',
-                  border: '1px solid rgba(232, 210, 181, 0.35)',
-                  color: '#FFF6EB',
-                  borderRadius: '4px',
-                  padding: '6px 14px',
-                  fontSize: '0.74rem',
-                  fontWeight: 700,
-                  cursor: 'pointer',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px'
-                }}
-              >
-                <Zap size={12} color="var(--cream-beige)" />
-                <span>Test with Sample Match (sample_match.mp4)</span>
-              </button>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                <button
+                  onClick={() => handleStartAnalysis(true, 'match_broadcast_demo.mp4')}
+                  style={{
+                    backgroundColor: 'rgba(232, 210, 181, 0.16)',
+                    border: '1px solid rgba(232, 210, 181, 0.4)',
+                    color: '#FFF6EB',
+                    borderRadius: '4px',
+                    padding: '7px 14px',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.28)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.16)')}
+                >
+                  <Zap size={12} color="var(--cream-beige)" />
+                  <span>Real Broadcast Match Clip (720p HD)</span>
+                </button>
+
+                <button
+                  onClick={() => handleStartAnalysis(true, 'match_clip_2.mp4')}
+                  style={{
+                    backgroundColor: 'rgba(232, 210, 181, 0.12)',
+                    border: '1px solid rgba(232, 210, 181, 0.3)',
+                    color: '#FFF6EB',
+                    borderRadius: '4px',
+                    padding: '7px 14px',
+                    fontSize: '0.74rem',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px',
+                    transition: 'all 0.15s ease'
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.24)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.12)')}
+                >
+                  <Play size={11} fill="var(--cream-beige)" color="var(--cream-beige)" />
+                  <span>Broadcast Sequence 2</span>
+                </button>
+
+                <button
+                  onClick={() => handleStartAnalysis(true, 'sample_match.mp4')}
+                  style={{
+                    backgroundColor: 'rgba(232, 210, 181, 0.08)',
+                    border: '1px solid rgba(232, 210, 181, 0.2)',
+                    color: 'rgba(255, 246, 235, 0.85)',
+                    borderRadius: '4px',
+                    padding: '7px 14px',
+                    fontSize: '0.74rem',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  <span>Tactical Sim (sample_match.mp4)</span>
+                </button>
+              </div>
             </div>
           </div>
 

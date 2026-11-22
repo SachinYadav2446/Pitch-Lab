@@ -246,22 +246,30 @@ async def analyze_match_video(
 @app.post("/api/analyze-demo")
 async def analyze_demo_match(
     background_tasks: BackgroundTasks,
+    clip_name: str = Form("match_broadcast_demo.mp4"),
     max_frames: int = Form(120),
     conf_thresh: float = Form(0.25),
     model_name: str = Form("yolov8n.pt")
 ):
     """
-    Triggers analysis on the bundled demo match (sample_match.mp4).
+    Triggers analysis on one of the bundled demo match clips.
     """
-    sample_path = os.path.join(os.path.dirname(__file__), "sample_match.mp4")
+    available_clips = ["match_broadcast_demo.mp4", "match_clip_2.mp4", "sample_match.mp4"]
+    target_clip = clip_name if clip_name in available_clips else "match_broadcast_demo.mp4"
+
+    sample_path = os.path.join(os.path.dirname(__file__), target_clip)
     if not os.path.exists(sample_path):
-        raise HTTPException(status_code=404, detail="sample_match.mp4 not found on server.")
+        sample_path = os.path.join(os.path.dirname(__file__), "sample_match.mp4")
+        target_clip = "sample_match.mp4"
+
+    if not os.path.exists(sample_path):
+        raise HTTPException(status_code=404, detail=f"Demo match {target_clip} not found on server.")
         
     job_id = f"demo_{uuid.uuid4().hex[:8]}"
     
     jobs_db[job_id] = {
         "job_id": job_id,
-        "filename": "sample_match.mp4",
+        "filename": target_clip,
         "status": "queued",
         "progress": 0.0,
         "current_frame": 0,
@@ -283,8 +291,8 @@ async def analyze_demo_match(
     return {
         "job_id": job_id,
         "status": "queued",
-        "filename": "sample_match.mp4",
-        "message": "Demo match queued for live YOLOv8 analysis."
+        "filename": target_clip,
+        "message": f"Demo video ({target_clip}) queued for live YOLOv8 analysis."
     }
 
 @app.get("/api/jobs/{job_id}")

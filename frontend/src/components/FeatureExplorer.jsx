@@ -750,35 +750,8 @@ export default function FeatureExplorer({ externalFeatureIndex, onFeatureChange 
                   paddingTop: '8px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '14px',
-                  flexWrap: 'wrap'
+                  gap: '12px'
                 }}>
-                  {currentFeature.id === 'visionstudio' && (
-                    <button
-                      onClick={() => {
-                        const studioEl = document.querySelector('#vision-studio');
-                        if (studioEl) studioEl.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      style={{
-                        backgroundColor: 'var(--burgundy-deep)',
-                        color: 'var(--cream-beige)',
-                        border: 'none',
-                        borderRadius: '2px',
-                        padding: '6px 14px',
-                        fontSize: '0.74rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        display: 'inline-flex',
-                        alignItems: 'center',
-                        gap: '6px',
-                        boxShadow: '0 4px 12px rgba(89, 9, 7, 0.25)'
-                      }}
-                    >
-                      <span>Open Live Studio & Video Uploader</span>
-                      <ArrowRight size={12} color="var(--cream-beige)" />
-                    </button>
-                  )}
-
                   {activeSubfeatureIndex < currentFeature.subfeatures.length - 1 ? (
                     <button
                       onClick={() => setActiveSubfeatureIndex(prev => prev + 1)}

@@ -1,20 +1,225 @@
-import React, { useRef, useState } from 'react';
-import { Zap, ArrowRight } from 'lucide-react';
+import React, { useRef, useState, useEffect } from 'react';
+import { Zap, ArrowRight, Play, Pause, Compass, Layers } from 'lucide-react';
 
 export default function Hero({ onLaunchStudio }) {
-  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(true);
+  const [showPassingLanes, setShowPassingLanes] = useState(true);
+  const [showFormation, setShowFormation] = useState(true);
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Tactical Squad: Warm Cream Beige (#E8D2B5) vs Deep Burgundy (#590907)
+    const players = [
+      // Attacking Team (Warm Cream Beige)
+      { id: 1, x: width * 0.16, y: height * 0.50, vx: 0.1, vy: 0.15, team: 'cream', num: 1 },
+      { id: 2, x: width * 0.32, y: height * 0.22, vx: 0.35, vy: -0.15, team: 'cream', num: 2 },
+      { id: 3, x: width * 0.30, y: height * 0.44, vx: 0.2, vy: 0.1, team: 'cream', num: 4 },
+      { id: 4, x: width * 0.30, y: height * 0.58, vx: 0.2, vy: -0.1, team: 'cream', num: 5 },
+      { id: 5, x: width * 0.32, y: height * 0.78, vx: 0.3, vy: 0.2, team: 'cream', num: 3 },
+      { id: 6, x: width * 0.46, y: height * 0.50, vx: 0.4, vy: 0.25, team: 'cream', num: 6 },
+      { id: 7, x: width * 0.54, y: height * 0.32, vx: 0.45, vy: -0.2, team: 'cream', num: 8 },
+      { id: 8, x: width * 0.56, y: height * 0.68, vx: 0.35, vy: 0.3, team: 'cream', num: 10 },
+      { id: 9, x: width * 0.72, y: height * 0.24, vx: 0.5, vy: 0.2, team: 'cream', num: 7 },
+      { id: 10, x: width * 0.76, y: height * 0.50, vx: 0.4, vy: -0.25, team: 'cream', num: 9 },
+      { id: 11, x: width * 0.70, y: height * 0.76, vx: 0.55, vy: -0.3, team: 'cream', num: 11 },
+
+      // Defending Team (Deep Burgundy)
+      { id: 12, x: width * 0.90, y: height * 0.50, vx: -0.1, vy: -0.1, team: 'burgundy', num: 13 },
+      { id: 13, x: width * 0.78, y: height * 0.28, vx: -0.3, vy: 0.2, team: 'burgundy', num: 12 },
+      { id: 14, x: width * 0.80, y: height * 0.43, vx: -0.35, vy: -0.15, team: 'burgundy', num: 15 },
+      { id: 15, x: width * 0.80, y: height * 0.57, vx: -0.3, vy: 0.15, team: 'burgundy', num: 14 },
+      { id: 16, x: width * 0.78, y: height * 0.72, vx: -0.25, vy: -0.2, team: 'burgundy', num: 16 },
+      { id: 17, x: width * 0.62, y: height * 0.26, vx: -0.4, vy: 0.25, team: 'burgundy', num: 17 },
+      { id: 18, x: width * 0.64, y: height * 0.44, vx: -0.45, vy: -0.2, team: 'burgundy', num: 18 },
+      { id: 19, x: width * 0.64, y: height * 0.56, vx: -0.35, vy: 0.3, team: 'burgundy', num: 20 },
+      { id: 20, x: width * 0.62, y: height * 0.74, vx: -0.4, vy: -0.2, team: 'burgundy', num: 21 },
+      { id: 21, x: width * 0.48, y: height * 0.42, vx: -0.25, vy: 0.2, team: 'burgundy', num: 19 },
+      { id: 22, x: width * 0.46, y: height * 0.58, vx: -0.2, vy: -0.25, team: 'burgundy', num: 99 },
+    ];
+
+    let ball = {
+      x: width * 0.54,
+      y: height * 0.32,
+      targetPlayer: 9,
+      speed: 3.5,
+      trail: []
+    };
+
+    function renderPitch() {
+      // 1. Deep Burgundy Tactical Turf (#380504)
+      ctx.fillStyle = '#2D0403';
+      ctx.fillRect(0, 0, width, height);
+
+      // Mowing stripes
+      const stripes = 12;
+      const stripeW = width / stripes;
+      for (let i = 0; i < stripes; i++) {
+        ctx.fillStyle = i % 2 === 0 ? '#260303' : '#330504';
+        ctx.fillRect(i * stripeW, 0, stripeW, height);
       }
-      setIsPlaying(!isPlaying);
+
+      // 2. Pitch Markings in Warm Cream Beige (#E8D2B5)
+      ctx.strokeStyle = 'rgba(232, 210, 181, 0.45)';
+      ctx.lineWidth = 1.6;
+
+      const pad = 24;
+      ctx.strokeRect(pad, pad, width - pad * 2, height - pad * 2);
+
+      // Center Line
+      ctx.beginPath();
+      ctx.moveTo(width / 2, pad);
+      ctx.lineTo(width / 2, height - pad);
+      ctx.stroke();
+
+      // Center Circle
+      ctx.beginPath();
+      ctx.arc(width / 2, height / 2, 60, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // Penalty Boxes
+      const boxW = 100;
+      const boxH = 200;
+      ctx.strokeRect(pad, (height - boxH) / 2, boxW, boxH);
+      ctx.strokeRect(width - pad - boxW, (height - boxH) / 2, boxW, boxH);
+
+      // 6-Yard Boxes
+      const sBoxW = 34;
+      const sBoxH = 90;
+      ctx.strokeRect(pad, (height - sBoxH) / 2, sBoxW, sBoxH);
+      ctx.strokeRect(width - pad - sBoxW, (height - sBoxH) / 2, sBoxW, sBoxH);
     }
-  };
+
+    function renderTactics() {
+      // Formation Mesh Triangles
+      if (showFormation) {
+        const creamPlayers = players.filter(p => p.team === 'cream');
+        ctx.strokeStyle = 'rgba(232, 210, 181, 0.22)';
+        ctx.fillStyle = 'rgba(232, 210, 181, 0.05)';
+        ctx.lineWidth = 1;
+
+        const triangles = [
+          [creamPlayers[5], creamPlayers[6], creamPlayers[7]],
+          [creamPlayers[6], creamPlayers[8], creamPlayers[9]],
+          [creamPlayers[7], creamPlayers[9], creamPlayers[10]],
+          [creamPlayers[1], creamPlayers[5], creamPlayers[6]],
+        ];
+
+        triangles.forEach(tri => {
+          if (tri[0] && tri[1] && tri[2]) {
+            ctx.beginPath();
+            ctx.moveTo(tri[0].x, tri[0].y);
+            ctx.lineTo(tri[1].x, tri[1].y);
+            ctx.lineTo(tri[2].x, tri[2].y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+          }
+        });
+      }
+
+      // Passing Lanes
+      if (showPassingLanes) {
+        const passer = players.find(p => p.id === 7);
+        const receiver = players.find(p => p.id === 9);
+
+        if (passer && receiver) {
+          ctx.strokeStyle = 'rgba(232, 210, 181, 0.7)';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([6, 6]);
+          ctx.beginPath();
+          ctx.moveTo(passer.x, passer.y);
+          ctx.lineTo(receiver.x, receiver.y);
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+      }
+
+      // Update & Draw Players
+      players.forEach(p => {
+        if (isPlaying) {
+          p.x += p.vx;
+          p.y += p.vy;
+
+          const margin = 35;
+          if (p.x < margin || p.x > width - margin) p.vx *= -1;
+          if (p.y < margin || p.y > height - margin) p.vy *= -1;
+        }
+
+        // Outer ring
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 11, 0, Math.PI * 2);
+        ctx.fillStyle = p.team === 'cream' ? 'rgba(232, 210, 181, 0.2)' : 'rgba(89, 9, 7, 0.4)';
+        ctx.strokeStyle = p.team === 'cream' ? '#E8D2B5' : '#8F1411';
+        ctx.lineWidth = 1.4;
+        ctx.fill();
+        ctx.stroke();
+
+        // Core jersey
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 7, 0, Math.PI * 2);
+        ctx.fillStyle = p.team === 'cream' ? '#E8D2B5' : '#590907';
+        ctx.fill();
+
+        // Number
+        ctx.fillStyle = p.team === 'cream' ? '#380504' : '#E8D2B5';
+        ctx.font = 'bold 8px "Plus Jakarta Sans", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(p.num.toString(), p.x, p.y);
+      });
+
+      // Ball Update
+      if (isPlaying) {
+        const target = players.find(p => p.id === ball.targetPlayer);
+        if (target) {
+          const dx = target.x - ball.x;
+          const dy = target.y - ball.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist > 8) {
+            ball.x += (dx / dist) * ball.speed;
+            ball.y += (dy / dist) * ball.speed;
+          } else {
+            const targets = [9, 10, 8, 7];
+            const currentIdx = targets.indexOf(ball.targetPlayer);
+            ball.targetPlayer = targets[(currentIdx + 1) % targets.length];
+          }
+
+          ball.trail.push({ x: ball.x, y: ball.y });
+          if (ball.trail.length > 8) ball.trail.shift();
+        }
+      }
+
+      // Draw Ball
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, 4.5, 0, Math.PI * 2);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.shadowColor = '#E8D2B5';
+      ctx.shadowBlur = 10;
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    function loop() {
+      renderPitch();
+      renderTactics();
+      animationFrameId = requestAnimationFrame(loop);
+    }
+
+    loop();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [isPlaying, showPassingLanes, showFormation]);
 
   return (
     <section style={{
@@ -168,11 +373,11 @@ export default function Hero({ onLaunchStudio }) {
             flexWrap: 'wrap'
           }}>
             <button
-              onClick={togglePlay}
+              onClick={() => setIsPlaying(!isPlaying)}
               className="btn-cream-secondary"
             >
-              <Zap size={15} color="#590907" />
-              <span>Interactive Demo</span>
+              {isPlaying ? <Pause size={15} color="#590907" /> : <Play size={15} color="#590907" />}
+              <span>{isPlaying ? 'Pause Simulation' : 'Play Simulation'}</span>
             </button>
 
             <button
@@ -186,7 +391,8 @@ export default function Hero({ onLaunchStudio }) {
         </div>
 
         {/* ========================================================
-            RIGHT & BOTTOM: Custom Notched Video Cutout
+            RIGHT & BOTTOM: Custom Notched Interactive Tactical Canvas
+            (Video Removed, Replaced with Real-Time 2D Radar Simulation)
             ======================================================== */}
         <div style={{
           position: 'absolute',
@@ -232,37 +438,26 @@ export default function Hero({ onLaunchStudio }) {
             />
           </svg>
 
-          {/* The Video Element clipped to the Custom Notch Shape */}
+          {/* Real-Time HTML5 Interactive Canvas clipped to Custom Notch Shape */}
           <div style={{
             position: 'absolute',
             inset: 0,
             clipPath: 'url(#vortex-hero-cutout)',
             WebkitClipPath: 'url(#vortex-hero-cutout)',
-            background: '#1A0403',
-            overflow: 'hidden'
+            background: '#2D0403',
+            overflow: 'hidden',
+            pointerEvents: 'auto'
           }}>
-            <video
-              ref={videoRef}
-              src="/kicking_hero.mp4"
-              autoPlay
-              loop
-              muted
-              playsInline
+            <canvas
+              ref={canvasRef}
+              width={1200}
+              height={660}
               style={{
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
                 display: 'block'
               }}
             />
-
-            {/* Subtle Burgundy grading vignette */}
-            <div style={{
-              position: 'absolute',
-              inset: 0,
-              background: 'radial-gradient(circle at 75% 40%, transparent 40%, rgba(89, 9, 7, 0.45) 100%)',
-              mixBlendMode: 'multiply'
-            }} />
           </div>
 
           {/* ========================================================
@@ -280,7 +475,7 @@ export default function Hero({ onLaunchStudio }) {
             gap: '8px',
             padding: '7px 16px',
             borderRadius: '20px',
-            background: 'rgba(89, 9, 7, 0.88)',
+            background: 'rgba(89, 9, 7, 0.92)',
             backdropFilter: 'blur(12px)',
             border: '1px solid var(--cream-beige)',
             fontSize: '0.72rem',
@@ -370,7 +565,7 @@ export default function Hero({ onLaunchStudio }) {
             zIndex: 8,
             padding: '14px 20px',
             borderRadius: '16px',
-            background: 'rgba(89, 9, 7, 0.92)',
+            background: 'rgba(89, 9, 7, 0.95)',
             backdropFilter: 'blur(16px)',
             border: '1px solid var(--cream-beige)',
             boxShadow: '0 10px 30px rgba(89, 9, 7, 0.45)',

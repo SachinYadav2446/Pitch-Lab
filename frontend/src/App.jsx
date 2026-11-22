@@ -1,6 +1,7 @@
 import React from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import HomographyFeature from './components/HomographyFeature';
 
 export default function App() {
   const handleLaunchStudio = () => {
@@ -18,9 +19,13 @@ export default function App() {
       {/* Section 1: Header Navigation */}
       <Navbar onLaunchStudio={handleLaunchStudio} />
 
-      {/* Section 2: Hero Section */}
+      {/* Main Content Flow */}
       <main style={{ flex: 1 }}>
+        {/* Section 2: Hero Section */}
         <Hero onLaunchStudio={handleLaunchStudio} />
+
+        {/* Section 3: Feature 1 - Planar Pitch Homography Engine */}
+        <HomographyFeature />
       </main>
     </div>
   );

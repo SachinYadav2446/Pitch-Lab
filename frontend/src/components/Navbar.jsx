@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Cpu, Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,7 +16,7 @@ export default function Navbar({ onLaunchStudio }) {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      padding: '18px 48px',
+      padding: '20px 48px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
@@ -25,36 +25,15 @@ export default function Navbar({ onLaunchStudio }) {
       boxShadow: 'none',
       transition: 'all 0.3s ease'
     }}>
-      {/* Sleek Minimalist Emblem (Name & text removed for clean UX) */}
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <a
-          href="#"
-          style={{
-            width: '40px',
-            height: '40px',
-            borderRadius: '12px',
-            background: 'linear-gradient(135deg, #FFF0DC 0%, #E8D5BC 100%)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxShadow: '0 4px 18px rgba(0, 0, 0, 0.35), 0 0 16px rgba(255, 240, 220, 0.2)',
-            border: 'none',
-            textDecoration: 'none',
-            transition: 'transform 0.2s ease'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.06)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          aria-label="Home"
-        >
-          <Activity size={22} color="#48060B" strokeWidth={2.6} />
-        </a>
-      </div>
+      {/* Left spacer for perfect centering balance */}
+      <div style={{ flex: 1 }} className="hidden-mobile" />
 
-      {/* Desktop Navigation Links */}
+      {/* Clean Centered Navigation Links */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '36px'
+        gap: '42px',
+        justifyContent: 'center'
       }} className="hidden-mobile">
         {navLinks.map((link) => (
           <a
@@ -63,16 +42,16 @@ export default function Navbar({ onLaunchStudio }) {
             style={{
               textDecoration: 'none',
               color: 'var(--cream-secondary)',
-              fontSize: '0.92rem',
+              fontSize: '0.94rem',
               fontWeight: 600,
-              letterSpacing: '0.2px',
+              letterSpacing: '0.3px',
               opacity: 0.85,
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
               e.target.style.color = '#FFFFFF';
               e.target.style.opacity = '1';
-              e.target.style.textShadow = '0 0 10px rgba(255,240,220,0.5)';
+              e.target.style.textShadow = '0 0 12px rgba(255,240,220,0.6)';
             }}
             onMouseLeave={(e) => {
               e.target.style.color = 'var(--cream-secondary)';
@@ -85,34 +64,14 @@ export default function Navbar({ onLaunchStudio }) {
         ))}
       </div>
 
-      {/* Action Controls & Hardware Status */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-        {/* RTX Hardware Status Badge (Clean, borderless pill) */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '7px 16px',
-          borderRadius: '30px',
-          background: 'rgba(255, 240, 220, 0.06)',
-          border: 'none',
-          fontSize: '0.78rem',
-          fontWeight: 700,
-          color: 'var(--cream-primary)'
-        }} className="hidden-mobile">
-          <span style={{
-            width: '7px',
-            height: '7px',
-            borderRadius: '50%',
-            backgroundColor: '#FFF0DC',
-            boxShadow: '0 0 8px #FFF0DC',
-            display: 'inline-block'
-          }} />
-          <Cpu size={14} color="#FFF0DC" />
-          <span>RTX 4050 Active</span>
-        </div>
-
-        {/* Primary CTA Pill Button (Clean, rounded, borderless) */}
+      {/* Right Side Action CTA (Clean pill, no borders, no RTX text) */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '16px'
+      }}>
         <button
           onClick={onLaunchStudio}
           className="btn-cream-primary"
@@ -144,6 +103,55 @@ export default function Navbar({ onLaunchStudio }) {
           {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
         </button>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {mobileMenuOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          background: 'rgba(52, 4, 7, 0.98)',
+          backdropFilter: 'blur(20px)',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px'
+        }}>
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                textDecoration: 'none',
+                color: 'var(--cream-primary)',
+                fontSize: '1.1rem',
+                fontWeight: 600
+              }}
+            >
+              {link.label}
+            </a>
+          ))}
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              onLaunchStudio();
+            }}
+            className="btn-cream-primary"
+            style={{
+              border: 'none',
+              borderRadius: '30px',
+              padding: '12px 24px',
+              fontSize: '0.95rem',
+              justifyContent: 'center'
+            }}
+          >
+            <span>Launch Studio</span>
+            <ArrowUpRight size={16} />
+          </button>
+        </div>
+      )}
     </nav>
   );
 }

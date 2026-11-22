@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Pause, RotateCcw, Upload, Eye, Layers, FastForward, 
-  Maximize2, Activity, Compass, ShieldAlert, Cpu, Sparkles, Crosshair, Radio
+  Maximize2, Activity, Compass, ShieldAlert, Cpu, Sparkles, Crosshair, Radio,
+  Download, FileSpreadsheet
 } from 'lucide-react';
 
 export default function VisionStudio() {
@@ -66,6 +67,52 @@ export default function VisionStudio() {
         videoRef.current.play().catch(() => {});
       }
     }
+  };
+
+  // Export Telemetry as JSON
+  const handleExportJson = () => {
+    if (!telemetryFrames || telemetryFrames.length === 0) return;
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(telemetryFrames, null, 2));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", dataStr);
+    dlAnchor.setAttribute("download", `pitchvision_telemetry_${Date.now()}.json`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
+  };
+
+  // Export Telemetry as CSV
+  const handleExportCsv = () => {
+    if (!telemetryFrames || telemetryFrames.length === 0) return;
+    const headers = ["time_sec", "frame_idx", "player_id", "team", "pitch_x_m", "pitch_y_m", "speed_kmh", "ball_pitch_x_m", "ball_pitch_y_m"];
+    const rows = [];
+    telemetryFrames.forEach((frame, fIdx) => {
+      const t = frame.time || (fIdx / 30);
+      const bx = frame.ball?.pitch_x ?? '';
+      const by = frame.ball?.pitch_y ?? '';
+      if (frame.players && frame.players.length > 0) {
+        frame.players.forEach(p => {
+          rows.push([
+            t.toFixed(2),
+            fIdx,
+            p.id,
+            p.team,
+            p.pitch_x.toFixed(2),
+            p.pitch_y.toFixed(2),
+            p.speed_kmh.toFixed(1),
+            bx !== '' ? bx.toFixed(2) : '',
+            by !== '' ? by.toFixed(2) : ''
+          ].join(","));
+        });
+      }
+    });
+    const csvContent = "data:text/csv;charset=utf-8," + encodeURIComponent([headers.join(","), ...rows].join("\n"));
+    const dlAnchor = document.createElement('a');
+    dlAnchor.setAttribute("href", csvContent);
+    dlAnchor.setAttribute("download", `pitchvision_metrics_${Date.now()}.csv`);
+    document.body.appendChild(dlAnchor);
+    dlAnchor.click();
+    dlAnchor.remove();
   };
 
   // Play / Pause toggle
@@ -792,30 +839,106 @@ export default function VisionStudio() {
                 </span>
               </div>
 
-              {/* Upload Match Video Button (Sharp 2px radius) */}
-              <label style={{
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: 'rgba(232, 210, 181, 0.15)',
-                color: 'var(--cream-bg)',
-                padding: '5px 12px',
-                borderRadius: '2px',
-                fontSize: '0.72rem',
-                fontWeight: 800,
-                border: '1px solid rgba(232, 210, 181, 0.35)',
-                transition: 'all 0.15s'
-              }}>
-                <Upload size={12} color="var(--cream-light)" />
-                <span>Load Match Video</span>
-                <input
-                  type="file"
-                  accept="video/mp4,video/webm,video/quicktime"
-                  onChange={handleFileUpload}
-                  style={{ display: 'none' }}
-                />
-              </label>
+              {/* Video Actions: Upload + Telemetry Exports */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                {/* Upload Match Video Button */}
+                <label style={{
+                  cursor: 'pointer',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  backgroundColor: 'rgba(232, 210, 181, 0.22)',
+                  color: 'var(--cream-bg)',
+                  padding: '6px 14px',
+                  borderRadius: '2px',
+                  fontSize: '0.72rem',
+                  fontWeight: 800,
+                  border: '1.5px solid rgba(232, 210, 181, 0.5)',
+                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.25)',
+                  transition: 'all 0.15s ease'
+                }}
+                title="Upload match footage (.mp4, .mov, .webm) to run tracking overlays"
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.35)';
+                  e.currentTarget.style.borderColor = '#FFF6EB';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.22)';
+                  e.currentTarget.style.borderColor = 'rgba(232, 210, 181, 0.5)';
+                }}
+                >
+                  <Upload size={13} color="var(--cream-light)" strokeWidth={2.4} />
+                  <span>Load Match Video (.mp4)</span>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime"
+                    onChange={handleFileUpload}
+                    style={{ display: 'none' }}
+                  />
+                </label>
+
+                {/* Export Telemetry JSON */}
+                <button
+                  onClick={handleExportJson}
+                  style={{
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    backgroundColor: 'rgba(232, 210, 181, 0.10)',
+                    color: 'var(--cream-bg)',
+                    padding: '6px 11px',
+                    borderRadius: '2px',
+                    fontSize: '0.70rem',
+                    fontWeight: 700,
+                    border: '1px solid rgba(232, 210, 181, 0.25)',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Download raw frame-by-frame JSON telemetry"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.20)';
+                    e.currentTarget.style.borderColor = 'rgba(232, 210, 181, 0.45)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.10)';
+                    e.currentTarget.style.borderColor = 'rgba(232, 210, 181, 0.25)';
+                  }}
+                >
+                  <Download size={12} color="var(--cream-light)" />
+                  <span>Export JSON</span>
+                </button>
+
+                {/* Export Telemetry CSV */}
+                <button
+                  onClick={handleExportCsv}
+                  style={{
+                    cursor: 'pointer',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    backgroundColor: 'rgba(232, 210, 181, 0.10)',
+                    color: 'var(--cream-bg)',
+                    padding: '6px 11px',
+                    borderRadius: '2px',
+                    fontSize: '0.70rem',
+                    fontWeight: 700,
+                    border: '1px solid rgba(232, 210, 181, 0.25)',
+                    transition: 'all 0.15s ease'
+                  }}
+                  title="Download tabular CSV with speeds and pitch coordinates"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.20)';
+                    e.currentTarget.style.borderColor = 'rgba(232, 210, 181, 0.45)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(232, 210, 181, 0.10)';
+                    e.currentTarget.style.borderColor = 'rgba(232, 210, 181, 0.25)';
+                  }}
+                >
+                  <FileSpreadsheet size={12} color="var(--cream-light)" />
+                  <span>CSV</span>
+                </button>
+              </div>
             </div>
 
             {/* Video + Telemetry Canvas Container */}

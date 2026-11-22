@@ -1,16 +1,14 @@
 import React from 'react';
-import { ArrowRight, Menu } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const navLinks = [
-    { label: 'Vision Studio', href: '#vision-studio' },
-    { label: 'Homography', href: '#homography' },
-    { label: 'Space Control', href: '#space-control' },
-    { label: 'Deep Tracking', href: '#tracking-engine' },
-    { label: 'Pigment Clustering', href: '#clustering-engine' },
-    { label: 'Kinematics', href: '#kinematics-engine' },
-    { label: '3D Biomechanics', href: '#biomechanics-engine' },
-    { label: 'Pipeline', href: '#pipeline' },
+    { label: 'Vision Modules', href: '#features-showcase' },
+    { label: 'Spatial Homography', href: '#features-showcase' },
+    { label: 'Space Control', href: '#features-showcase' },
+    { label: 'Deep Tracking', href: '#features-showcase' },
+    { label: '3D Biomechanics', href: '#features-showcase' },
+    { label: 'Pipeline Architecture', href: '#features-showcase' }
   ];
 
   return (

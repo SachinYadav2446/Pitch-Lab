@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { Zap, ArrowRight, Play, Pause, Compass, Activity, Shield } from 'lucide-react';
+import { Zap, ArrowRight } from 'lucide-react';
 
 export default function Hero({ onLaunchStudio }) {
   const videoRef = useRef(null);
@@ -70,7 +69,7 @@ export default function Hero({ onLaunchStudio }) {
           display: 'flex',
           flexDirection: 'column'
         }}>
-          {/* Main Headline (VortexAI Typography) */}
+          {/* Main Headline (Warm Ivory Cream on Deep Burgundy) */}
           <h1 style={{
             fontSize: 'clamp(2.5rem, 4.2vw, 4.1rem)',
             fontWeight: 800,
@@ -81,10 +80,11 @@ export default function Hero({ onLaunchStudio }) {
           }}>
             Autonomous Sub-Pixel<br />
             <span style={{
-              color: '#E03542',
+              color: 'var(--cream-primary)',
               textDecoration: 'underline',
               textUnderlineOffset: '10px',
-              textDecorationThickness: '3.5px'
+              textDecorationThickness: '3.5px',
+              textDecorationColor: 'rgba(255, 240, 220, 0.65)'
             }}>
               Player Tracking
             </span> & Deep<br />
@@ -98,14 +98,14 @@ export default function Hero({ onLaunchStudio }) {
             gap: '18px',
             marginBottom: '32px'
           }}>
-            {/* Mini Radar / Preview Thumbnail Box (Matches cyclone box in screenshot) */}
+            {/* Mini Radar / Preview Thumbnail Box in Deep Burgundy & Ivory Cream */}
             <div style={{
               width: '82px',
               height: '82px',
               minWidth: '82px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, rgba(224, 53, 66, 0.25) 0%, rgba(15, 2, 4, 0.9) 100%)',
-              border: '1px solid rgba(224, 53, 66, 0.4)',
+              background: 'linear-gradient(135deg, rgba(121, 11, 19, 0.45) 0%, rgba(52, 4, 7, 0.95) 100%)',
+              border: '1px solid var(--cream-border)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -128,14 +128,14 @@ export default function Hero({ onLaunchStudio }) {
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                border: '1.5px solid rgba(224, 53, 66, 0.7)'
+                border: '1.5px solid rgba(255, 240, 220, 0.5)'
               }} />
               <div style={{
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#E03542',
-                boxShadow: '0 0 8px #E03542'
+                backgroundColor: '#FFF0DC',
+                boxShadow: '0 0 8px #FFF0DC'
               }} />
               <span style={{
                 position: 'absolute',
@@ -160,7 +160,7 @@ export default function Hero({ onLaunchStudio }) {
             </p>
           </div>
 
-          {/* Action Button Row (Matches GIS Mission Control & Interactive Demo in screenshot) */}
+          {/* Action Button Row */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
@@ -169,18 +169,18 @@ export default function Hero({ onLaunchStudio }) {
           }}>
             <button
               onClick={togglePlay}
-              className="btn-vortex-secondary"
+              className="btn-burgundy-secondary"
             >
-              <Zap size={15} color="#E03542" />
+              <Zap size={15} color="#FFF0DC" />
               <span>Interactive Demo</span>
             </button>
 
             <button
               onClick={onLaunchStudio}
-              className="btn-vortex-primary"
+              className="btn-cream-primary"
             >
               <span>Tactical Console</span>
-              <ArrowRight size={15} />
+              <ArrowRight size={15} color="#340407" />
             </button>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function Hero({ onLaunchStudio }) {
           zIndex: 5,
           pointerEvents: 'none'
         }}>
-          {/* Glowing Stroke Contour Line matching the exact silhouette */}
+          {/* Glowing Contour Line in Warm Ivory & Burgundy */}
           <svg
             style={{
               position: 'absolute',
@@ -225,10 +225,10 @@ export default function Hero({ onLaunchStudio }) {
                 Z
               "
               fill="none"
-              stroke="rgba(224, 53, 66, 0.75)"
+              stroke="rgba(255, 240, 220, 0.4)"
               strokeWidth="0.5"
               vectorEffect="non-scaling-stroke"
-              style={{ filter: 'drop-shadow(0 0 6px rgba(224, 53, 66, 0.4))' }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(255, 240, 220, 0.2))' }}
             />
           </svg>
 
@@ -238,7 +238,7 @@ export default function Hero({ onLaunchStudio }) {
             inset: 0,
             clipPath: 'url(#vortex-hero-cutout)',
             WebkitClipPath: 'url(#vortex-hero-cutout)',
-            background: '#150204',
+            background: 'var(--bg-burgundy-card)',
             overflow: 'hidden'
           }}>
             <video
@@ -256,20 +256,20 @@ export default function Hero({ onLaunchStudio }) {
               }}
             />
 
-            {/* Subtle cinematic gradient so overlays pop */}
+            {/* Subtle Burgundy grading vignette */}
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 75% 40%, transparent 30%, rgba(15, 2, 4, 0.55) 100%)',
+              background: 'radial-gradient(circle at 75% 40%, transparent 35%, rgba(52, 4, 7, 0.6) 100%)',
               mixBlendMode: 'multiply'
             }} />
           </div>
 
           {/* ========================================================
-              HUD OVERLAYS (Positioned precisely over the video silhouette)
+              HUD OVERLAYS in Warm Ivory Cream & Deep Burgundy
               ======================================================== */}
           
-          {/* 1. Top-Right Satellite / Broadcast Chip (Matches INSAT-3D pill in screenshot) */}
+          {/* 1. Top-Right Broadcast Chip */}
           <div style={{
             position: 'absolute',
             top: '20px',
@@ -280,9 +280,9 @@ export default function Hero({ onLaunchStudio }) {
             gap: '8px',
             padding: '7px 16px',
             borderRadius: '20px',
-            background: 'rgba(15, 2, 4, 0.75)',
+            background: 'rgba(52, 4, 7, 0.85)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid rgba(224, 53, 66, 0.4)',
+            border: '1px solid var(--cream-border)',
             fontSize: '0.72rem',
             fontWeight: 800,
             color: 'var(--cream-primary)',
@@ -293,13 +293,13 @@ export default function Hero({ onLaunchStudio }) {
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: '#E03542',
-              boxShadow: '0 0 8px #E03542'
+              backgroundColor: '#FFF0DC',
+              boxShadow: '0 0 8px #FFF0DC'
             }} />
             <span>OPTICAL TRACKER 74° ORBIT • 4K BROADCAST</span>
           </div>
 
-          {/* 2. Bottom-Left Extended Shelf Chips (Under the text block, matches EYE FIX chips) */}
+          {/* 2. Bottom-Left Extended Shelf Chips (Under text block) */}
           <div style={{
             position: 'absolute',
             bottom: '24px',
@@ -315,14 +315,14 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(15, 2, 4, 0.85)',
-              border: '1px solid rgba(255, 240, 220, 0.15)',
+              background: 'rgba(52, 4, 7, 0.88)',
+              border: '1px solid var(--cream-border)',
               fontSize: '0.75rem',
               fontWeight: 700,
               color: 'var(--cream-secondary)'
             }}>
               <span style={{ color: 'var(--cream-muted)' }}>TRACK FIX:</span>
-              <span style={{ color: '#E03542', fontWeight: 800 }}>0.8% MAE</span>
+              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>0.8% MAE</span>
             </div>
 
             <div style={{
@@ -331,14 +331,14 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(15, 2, 4, 0.85)',
-              border: '1px solid rgba(255, 240, 220, 0.15)',
+              background: 'rgba(52, 4, 7, 0.88)',
+              border: '1px solid var(--cream-border)',
               fontSize: '0.75rem',
               fontWeight: 700,
               color: 'var(--cream-secondary)'
             }}>
               <span style={{ color: 'var(--cream-muted)' }}>SPRINT:</span>
-              <span style={{ color: '#E03542', fontWeight: 800 }}>34.2 km/h</span>
+              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>34.2 km/h</span>
             </div>
 
             <div style={{
@@ -347,18 +347,18 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(15, 2, 4, 0.85)',
-              border: '1px solid rgba(255, 240, 220, 0.15)',
+              background: 'rgba(52, 4, 7, 0.88)',
+              border: '1px solid var(--cream-border)',
               fontSize: '0.75rem',
               fontWeight: 700,
               color: 'var(--cream-secondary)'
             }}>
               <span style={{ color: 'var(--cream-muted)' }}>GPU:</span>
-              <span style={{ color: '#E03542', fontWeight: 800 }}>&lt; 16 ms</span>
+              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>&lt; 16 ms</span>
             </div>
           </div>
 
-          {/* 3. Bottom-Right Telemetry Card (Matches the cylinder card in screenshot) */}
+          {/* 3. Bottom-Right Telemetry Card */}
           <div style={{
             position: 'absolute',
             bottom: '24px',
@@ -366,27 +366,27 @@ export default function Hero({ onLaunchStudio }) {
             zIndex: 8,
             padding: '14px 20px',
             borderRadius: '16px',
-            background: 'rgba(15, 2, 4, 0.82)',
+            background: 'rgba(52, 4, 7, 0.88)',
             backdropFilter: 'blur(16px)',
-            border: '1px solid rgba(224, 53, 66, 0.45)',
+            border: '1px solid var(--cream-border)',
             boxShadow: '0 10px 30px rgba(0, 0, 0, 0.65)',
             display: 'flex',
             alignItems: 'center',
             gap: '16px'
           }}>
-            {/* Wireframe Cylinder / Tactical Marker Icon */}
+            {/* Wireframe Cylinder in Warm Ivory */}
             <div style={{
               width: '36px',
               height: '42px',
-              border: '1.5px dashed #E03542',
+              border: '1.5px dashed rgba(255, 240, 220, 0.65)',
               borderRadius: '18px / 8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 10px rgba(224, 53, 66, 0.4)'
+              boxShadow: '0 0 10px rgba(255, 240, 220, 0.2)'
             }}>
-              <div style={{ width: '100%', height: '1px', background: '#E03542', margin: '4px 0' }} />
+              <div style={{ width: '100%', height: '1px', background: 'rgba(255, 240, 220, 0.65)', margin: '4px 0' }} />
             </div>
 
             <div>
@@ -396,11 +396,11 @@ export default function Hero({ onLaunchStudio }) {
                 gap: '6px',
                 fontSize: '0.7rem',
                 fontWeight: 800,
-                color: '#E03542',
+                color: 'var(--cream-primary)',
                 letterSpacing: '0.8px',
                 textTransform: 'uppercase'
               }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#E03542' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFF0DC' }} />
                 <span>BOB-SYS-01 • MATCH BROADCAST</span>
               </div>
 

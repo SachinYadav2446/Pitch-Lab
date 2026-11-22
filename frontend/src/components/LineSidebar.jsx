@@ -128,6 +128,12 @@ const LineSidebar = ({
   );
 
   useEffect(() => {
+    if (defaultActive !== null && defaultActive !== undefined) {
+      setActiveIndex(defaultActive);
+    }
+  }, [defaultActive]);
+
+  useEffect(() => {
     startLoop();
   }, [activeIndex, startLoop]);
 

@@ -413,9 +413,16 @@ const FEATURES_DATA = [
   }
 ];
 
-export default function FeatureExplorer() {
-  const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
+export default function FeatureExplorer({ externalFeatureIndex, onFeatureChange }) {
+  const [activeFeatureIndex, setActiveFeatureIndex] = useState(externalFeatureIndex ?? 0);
   const [activeSubfeatureIndex, setActiveSubfeatureIndex] = useState(0);
+
+  React.useEffect(() => {
+    if (externalFeatureIndex !== undefined && externalFeatureIndex !== null) {
+      setActiveFeatureIndex(externalFeatureIndex);
+      setActiveSubfeatureIndex(0);
+    }
+  }, [externalFeatureIndex]);
 
   const sidebarItems = FEATURES_DATA.map(f => f.title);
   const currentFeature = FEATURES_DATA[activeFeatureIndex] || FEATURES_DATA[0];
@@ -424,6 +431,7 @@ export default function FeatureExplorer() {
   const handleFeatureSelect = (index) => {
     setActiveFeatureIndex(index);
     setActiveSubfeatureIndex(0);
+    onFeatureChange?.(index);
   };
 
   return (

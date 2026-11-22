@@ -8,8 +8,18 @@ import TacticalAiModal from './components/TacticalAiModal';
 
 export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+  const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(0);
+
+  const handleNavSelectFeature = (index) => {
+    setSelectedFeatureIndex(index);
+    const el = document.querySelector('#features-explorer');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   const handleLaunchStudio = () => {
+    setSelectedFeatureIndex(6); // Vision Studio & 2D Radar
     const el = document.querySelector('#features-explorer');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
@@ -25,7 +35,7 @@ export default function App() {
       color: 'var(--text-burgundy)'
     }}>
       {/* Header Navigation */}
-      <Navbar onLaunchStudio={handleLaunchStudio} />
+      <Navbar onSelectFeature={handleNavSelectFeature} />
 
       {/* Main Content Flow */}
       <main style={{ flex: 1 }}>
@@ -33,7 +43,10 @@ export default function App() {
         <Hero onLaunchStudio={handleLaunchStudio} />
 
         {/* Section 2: Interactive Feature & Subfeature Matrix with LineSidebar */}
-        <FeatureExplorer />
+        <FeatureExplorer
+          externalFeatureIndex={selectedFeatureIndex}
+          onFeatureChange={setSelectedFeatureIndex}
+        />
       </main>
 
       {/* Footer */}

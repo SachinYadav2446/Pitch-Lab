@@ -4,6 +4,7 @@ import Hero from './components/Hero';
 import HomographyFeature from './components/HomographyFeature';
 import VoronoiFeature from './components/VoronoiFeature';
 import TrackingFeature from './components/TrackingFeature';
+import FloatingChatbotButton from './components/FloatingChatbotButton';
 
 export default function App() {
   const handleLaunchStudio = () => {
@@ -35,6 +36,9 @@ export default function App() {
         {/* Section 5: Feature 3 - Deep Multi-Object Tracking & Re-ID */}
         <TrackingFeature />
       </main>
+
+      {/* Floating AI Chatbot Button (Right Side) */}
+      <FloatingChatbotButton />
     </div>
   );
 }

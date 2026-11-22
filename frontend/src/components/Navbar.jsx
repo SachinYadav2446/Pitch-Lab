@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Activity, Bell, Menu, X } from 'lucide-react';
+import { ArrowRight, Menu, X } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -17,54 +17,23 @@ export default function Navbar({ onLaunchStudio }) {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      padding: '16px 44px',
+      padding: '20px 48px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      borderBottom: '1px solid var(--cream-border)'
+      border: 'none',
+      borderBottom: 'none',
+      boxShadow: 'none'
     }}>
-      {/* Left Brand Identity: Warm Ivory Cream & Deep Crimson */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <a href="#" style={{
-          textDecoration: 'none',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px'
-        }}>
-          <div style={{
-            width: '32px',
-            height: '32px',
-            borderRadius: '8px',
-            background: 'var(--burgundy-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            border: '1px solid var(--cream-border)'
-          }}>
-            <Activity size={18} color="#FFF0DC" />
-          </div>
-          <span style={{
-            fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: '1.35rem',
-            fontWeight: 800,
-            letterSpacing: '-0.02em',
-            color: 'var(--cream-primary)'
-          }}>
-            pitch<span style={{ color: 'var(--cream-secondary)', opacity: 0.85 }}>LAB</span>
-          </span>
-        </a>
-      </div>
+      {/* Left spacer for perfect center balance (Zero logo, Zero pitchLAB text) */}
+      <div style={{ flex: 1 }} className="hidden-mobile" />
 
-      {/* Center Nav Links Pill in Warm Ivory Glass */}
+      {/* Center Nav Links: Pure floating text without cylindrical pill container */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '24px',
-        background: 'rgba(255, 240, 220, 0.05)',
-        border: '1px solid var(--cream-border)',
-        padding: '8px 24px',
-        borderRadius: '30px',
-        backdropFilter: 'blur(10px)'
+        gap: '40px',
+        justifyContent: 'center'
       }} className="hidden-mobile">
         {navLinks.map((link) => (
           <a
@@ -73,17 +42,20 @@ export default function Navbar({ onLaunchStudio }) {
             style={{
               textDecoration: 'none',
               color: 'var(--cream-secondary)',
-              fontSize: '0.85rem',
+              fontSize: '0.92rem',
               fontWeight: 600,
-              letterSpacing: '0.2px',
+              letterSpacing: '0.3px',
+              opacity: 0.85,
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
               e.target.style.color = '#FFFFFF';
-              e.target.style.textShadow = '0 0 10px rgba(255, 240, 220, 0.6)';
+              e.target.style.opacity = '1';
+              e.target.style.textShadow = '0 0 12px rgba(255, 240, 220, 0.6)';
             }}
             onMouseLeave={(e) => {
               e.target.style.color = 'var(--cream-secondary)';
+              e.target.style.opacity = '0.85';
               e.target.style.textShadow = 'none';
             }}
           >
@@ -92,34 +64,26 @@ export default function Navbar({ onLaunchStudio }) {
         ))}
       </div>
 
-      {/* Right Action: Warm Ivory Cream Button + Notification Bell */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+      {/* Right Action: Clean Tactical Console Pill Button */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        gap: '12px'
+      }}>
         <button
           onClick={onLaunchStudio}
           className="btn-cream-primary"
-          style={{ padding: '8px 22px', fontSize: '0.85rem' }}
-        >
-          <Activity size={14} color="#340407" />
-          <span>Tactical Console</span>
-        </button>
-
-        <button
           style={{
-            width: '38px',
-            height: '38px',
-            borderRadius: '50%',
-            background: 'rgba(255, 240, 220, 0.05)',
-            border: '1px solid var(--cream-border)',
-            color: 'var(--cream-primary)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            transition: 'all 0.2s ease'
+            border: 'none',
+            borderRadius: '24px',
+            padding: '9px 24px',
+            fontSize: '0.86rem'
           }}
-          aria-label="Notifications"
         >
-          <Bell size={15} color="#FFF0DC" />
+          <span>Tactical Console</span>
+          <ArrowRight size={14} color="#340407" />
         </button>
 
         {/* Mobile Menu Button */}
@@ -139,6 +103,55 @@ export default function Navbar({ onLaunchStudio }) {
           {mobileMenuOpen ? <X size={24} color="#FFF0DC" /> : <Menu size={24} color="#FFF0DC" />}
         </button>
       </div>
+
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          background: 'rgba(52, 4, 7, 0.98)',
+          backdropFilter: 'blur(20px)',
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '20px'
+        }}>
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                textDecoration: 'none',
+                color: 'var(--cream-primary)',
+                fontSize: '1.05rem',
+                fontWeight: 600
+              }}
+            >
+              {link.label}
+            </a>
+          ))}
+          <button
+            onClick={() => {
+              setMobileMenuOpen(false);
+              onLaunchStudio();
+            }}
+            className="btn-cream-primary"
+            style={{
+              border: 'none',
+              borderRadius: '24px',
+              padding: '12px 24px',
+              fontSize: '0.92rem',
+              justifyContent: 'center'
+            }}
+          >
+            <span>Tactical Console</span>
+            <ArrowRight size={14} color="#340407" />
+          </button>
+        </div>
+      )}
     </nav>
   );
 }

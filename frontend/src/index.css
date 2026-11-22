@@ -76,13 +76,13 @@ h1, h2, h3, h4, h5, .font-heading {
   background: var(--cream-primary);
 }
 
-/* Navigation Blur */
+/* Clean Floating Navigation (Completely Borderless) */
 .glass-nav {
-  background: rgba(52, 4, 7, 0.82);
+  background: rgba(52, 4, 7, 0.75);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: none;
-  border-bottom: 1px solid var(--cream-border);
+  border-bottom: none;
 }
 
 /* Primary Warm Ivory Cream Button */

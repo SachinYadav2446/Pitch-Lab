@@ -1,7 +1,58 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 
 export default function Hero({ onLaunchStudio }) {
+  const brandTarget = 'pitchvision.ai';
+  const [displayText, setDisplayText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    let timer;
+    if (!isDeleting) {
+      if (displayText.length < brandTarget.length) {
+        // Typing letter by letter
+        timer = setTimeout(() => {
+          setDisplayText(brandTarget.slice(0, displayText.length + 1));
+        }, 120);
+      } else {
+        // Pause at full word before backspacing
+        timer = setTimeout(() => {
+          setIsDeleting(true);
+        }, 2200);
+      }
+    } else {
+      if (displayText.length > 0) {
+        // Deleting letter by letter
+        timer = setTimeout(() => {
+          setDisplayText(brandTarget.slice(0, displayText.length - 1));
+        }, 60);
+      } else {
+        // Pause when empty before typing loop repeats
+        timer = setTimeout(() => {
+          setIsDeleting(false);
+        }, 450);
+      }
+    }
+
+    return () => clearTimeout(timer);
+  }, [displayText, isDeleting]);
+
+  // Formatter to render .ai with subtle differentiation when reached
+  const renderTypedBrand = () => {
+    if (displayText.includes('.')) {
+      const dotIndex = displayText.indexOf('.');
+      const main = displayText.slice(0, dotIndex);
+      const ext = displayText.slice(dotIndex);
+      return (
+        <>
+          {main}
+          <span style={{ opacity: 0.6 }}>{ext}</span>
+        </>
+      );
+    }
+    return displayText;
+  };
+
   return (
     <section style={{
       position: 'relative',
@@ -27,7 +78,7 @@ export default function Hero({ onLaunchStudio }) {
       }}>
         {/* ========================================================
             LEFT SIDE CONTENT AREA (To the left of the vertical section)
-            Brand Name + Subheading + Description + Button
+            Brand Name (Typewriter loop) + Single Subheading + Button
             ======================================================== */}
         <div style={{
           flex: 1,
@@ -38,46 +89,38 @@ export default function Hero({ onLaunchStudio }) {
           justifyContent: 'center',
           maxWidth: '640px'
         }}>
-          {/* 1. Main Project / Brand Name */}
+          {/* 1. Main Project / Brand Name with Typewriter Loop */}
           <h1 style={{
             fontFamily: 'Space Grotesk, sans-serif',
             fontSize: 'clamp(3.2rem, 5.6vw, 5rem)',
             fontWeight: 800,
-            lineHeight: 1.02,
+            lineHeight: 1.05,
             letterSpacing: '-0.04em',
             color: 'var(--burgundy-deep)',
-            marginBottom: '14px'
+            marginBottom: '18px',
+            minHeight: '1.15em',
+            display: 'inline-flex',
+            alignItems: 'baseline'
           }}>
-            pitchvision<span style={{ opacity: 0.6 }}>.ai</span>
+            <span>{renderTypedBrand()}</span>
+            <span className="typewriter-cursor" aria-hidden="true" />
           </h1>
 
-          {/* 2. Subheading Below Name */}
+          {/* 2. Single Subheading Below Name */}
           <p style={{
             fontFamily: 'Space Grotesk, sans-serif',
-            fontSize: 'clamp(1.2rem, 2vw, 1.6rem)',
-            fontWeight: 700,
-            lineHeight: 1.3,
+            fontSize: 'clamp(1.15rem, 1.9vw, 1.45rem)',
+            fontWeight: 600,
+            lineHeight: 1.4,
             letterSpacing: '-0.02em',
             color: 'var(--burgundy-deep)',
-            marginBottom: '18px'
+            maxWidth: '520px',
+            marginBottom: '34px'
           }}>
             Autonomous Spatial Intelligence for Elite Football.
           </p>
 
-          {/* 3. Subtitle / Descriptive Paragraph */}
-          <p style={{
-            fontSize: '1.02rem',
-            lineHeight: 1.65,
-            color: 'var(--text-burgundy-muted)',
-            fontWeight: 500,
-            maxWidth: '520px',
-            marginBottom: '32px'
-          }}>
-            Transform standard broadcast match footage into continuous sub-pixel player tracking, 
-            planar pitch homography, and real-time physical performance telemetry in &lt;16 ms.
-          </p>
-
-          {/* 4. Action Button */}
+          {/* 3. Action Button */}
           <div style={{
             display: 'flex',
             alignItems: 'center',

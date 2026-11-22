@@ -83,7 +83,7 @@ export default function Navbar({ onLaunchStudio }) {
         </div>
       </div>
 
-      {/* Right Action: Warm Cream Beige Button for High Contrast on Burgundy Slab */}
+      {/* Right Action: Button exactly as in the screenshot */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -94,30 +94,20 @@ export default function Navbar({ onLaunchStudio }) {
           style={{
             background: 'var(--cream-beige)',
             color: 'var(--burgundy-deep)',
-            border: '1px solid rgba(89, 9, 7, 0.25)',
+            border: 'none',
             borderRadius: '20px',
-            padding: '7px 20px',
-            fontSize: '0.78rem',
+            padding: '8px 22px',
+            fontSize: '0.80rem',
             fontWeight: 800,
             fontFamily: 'Space Grotesk, sans-serif',
             cursor: 'pointer',
             display: 'inline-flex',
             alignItems: 'center',
-            gap: '8px',
             boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
             transition: 'all 0.2s ease'
           }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.background = '#FFFFFF';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.background = 'var(--cream-beige)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
         >
-          <span>Tactical Console</span>
-          <ArrowRight size={13} color="var(--burgundy-deep)" />
+          Tactical Console
         </button>
       </div>
     </nav>

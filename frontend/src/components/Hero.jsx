@@ -37,23 +37,23 @@ export default function Hero({ onLaunchStudio }) {
         </div>
 
         {/* Leaned Deep Burgundy Vertical Section
+            - Shifted left to marginRight: 260px so it does NOT overlap with the button
+            - Width: 440px
             - Extends from Top of Screen (including Navbar) to Bottom
-            - Shifted more to the left
-            - Generous 540px width
         */}
         <div style={{
           position: 'relative',
-          width: '540px',
-          minWidth: '480px',
+          width: '440px',
+          minWidth: '380px',
           height: '100%',
-          marginRight: '140px', // Shifted a bit in left as requested
+          marginRight: '260px', // Shifted to left: completely clears the Tactical Console button
           zIndex: 5
         }}>
           {/* Angled Deep Burgundy Slab (#590907) Slicing from Top to Bottom */}
           <div style={{
             position: 'absolute',
-            top: '-40px', // Goes all the way through the navbar to the very top edge
-            bottom: '-40px', // Extends all the way to the very bottom edge
+            top: '-40px',
+            bottom: '-40px',
             left: 0,
             right: 0,
             background: 'linear-gradient(175deg, #590907 0%, #430504 100%)',
@@ -83,7 +83,7 @@ export default function Hero({ onLaunchStudio }) {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '90px 36px 48px',
+            padding: '90px 32px 48px',
             color: 'var(--cream-beige)'
           }}>
             <div style={{

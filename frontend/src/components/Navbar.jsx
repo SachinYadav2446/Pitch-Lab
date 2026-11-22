@@ -12,16 +12,19 @@ export default function Navbar({ onLaunchStudio }) {
 
   return (
     <nav className="glass-nav" style={{
-      position: 'sticky',
+      position: 'absolute',
       top: 0,
-      zIndex: 1000,
-      padding: '10px 40px',
+      left: 0,
+      right: 0,
+      zIndex: 100,
+      padding: '16px 48px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
       border: 'none',
       borderBottom: 'none',
-      boxShadow: 'none'
+      boxShadow: 'none',
+      background: 'transparent'
     }}>
       {/* Left-Centered Navigation Group */}
       <div style={{
@@ -29,7 +32,7 @@ export default function Navbar({ onLaunchStudio }) {
         alignItems: 'center',
         gap: '24px'
       }}>
-        {/* Three Lines Menu Icon (Click disabled for now) */}
+        {/* Three Lines Menu Icon */}
         <div
           style={{
             background: 'transparent',
@@ -59,7 +62,7 @@ export default function Navbar({ onLaunchStudio }) {
               style={{
                 textDecoration: 'none',
                 color: 'var(--burgundy-deep)',
-                fontSize: '0.80rem',
+                fontSize: '0.82rem',
                 fontWeight: 700,
                 letterSpacing: '0.2px',
                 opacity: 0.88,
@@ -80,23 +83,41 @@ export default function Navbar({ onLaunchStudio }) {
         </div>
       </div>
 
-      {/* Right Action: Compact CTA Button */}
+      {/* Right Action: Warm Cream Beige Button for High Contrast on Burgundy Slab */}
       <div style={{
         display: 'flex',
-        alignItems: 'center'
+        alignItems: 'center',
+        zIndex: 101
       }}>
         <button
           onClick={onLaunchStudio}
-          className="btn-burgundy-primary"
           style={{
+            background: 'var(--cream-beige)',
+            color: 'var(--burgundy-deep)',
+            border: '1px solid rgba(89, 9, 7, 0.25)',
             borderRadius: '20px',
-            padding: '7px 18px',
+            padding: '7px 20px',
             fontSize: '0.78rem',
-            border: 'none'
+            fontWeight: 800,
+            fontFamily: 'Space Grotesk, sans-serif',
+            cursor: 'pointer',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
+            transition: 'all 0.2s ease'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = '#FFFFFF';
+            e.currentTarget.style.transform = 'translateY(-1px)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'var(--cream-beige)';
+            e.currentTarget.style.transform = 'translateY(0)';
           }}
         >
           <span>Tactical Console</span>
-          <ArrowRight size={13} color="var(--cream-beige)" />
+          <ArrowRight size={13} color="var(--burgundy-deep)" />
         </button>
       </div>
     </nav>

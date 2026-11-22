@@ -5,8 +5,8 @@ export default function Hero({ onLaunchStudio }) {
     <section style={{
       position: 'relative',
       width: '100%',
-      minHeight: 'calc(100vh - 54px)', // Spans top to bottom directly under navbar
-      height: 'calc(100vh - 54px)',
+      minHeight: '100vh',
+      height: '100vh',
       display: 'flex',
       alignItems: 'stretch',
       overflow: 'hidden',
@@ -24,32 +24,36 @@ export default function Hero({ onLaunchStudio }) {
         justifyContent: 'space-between',
         height: '100%'
       }}>
-        {/* Left Side Space (Reserved for the remaining 2 parts) */}
+        {/* Left Side Space (Reserved for Part 1 & Part 2) */}
         <div style={{
           flex: 1,
           zIndex: 10,
-          padding: '48px',
+          padding: '90px 48px 48px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center'
         }}>
-          {/* Space reserved for Part 1 & Part 2 */}
+          {/* Content reserved for remaining sections */}
         </div>
 
-        {/* Leaned Deep Burgundy Vertical Section (Spans Top to Bottom, angled) */}
+        {/* Leaned Deep Burgundy Vertical Section
+            - Extends from Top of Screen (including Navbar) to Bottom
+            - Shifted more to the left
+            - Generous 540px width
+        */}
         <div style={{
           position: 'relative',
-          width: '520px',
-          minWidth: '460px',
+          width: '540px',
+          minWidth: '480px',
           height: '100%',
-          marginRight: '60px', // Leaning towards the right side of screen
+          marginRight: '140px', // Shifted a bit in left as requested
           zIndex: 5
         }}>
-          {/* Angled Deep Burgundy Slab (#590907) */}
+          {/* Angled Deep Burgundy Slab (#590907) Slicing from Top to Bottom */}
           <div style={{
             position: 'absolute',
-            top: '-20px',
-            bottom: '-20px',
+            top: '-40px', // Goes all the way through the navbar to the very top edge
+            bottom: '-40px', // Extends all the way to the very bottom edge
             left: 0,
             right: 0,
             background: 'linear-gradient(175deg, #590907 0%, #430504 100%)',
@@ -79,10 +83,9 @@ export default function Hero({ onLaunchStudio }) {
             flexDirection: 'column',
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '48px 36px',
+            padding: '90px 36px 48px',
             color: 'var(--cream-beige)'
           }}>
-            {/* Content area ready for Part 3 */}
             <div style={{
               display: 'flex',
               alignItems: 'center',

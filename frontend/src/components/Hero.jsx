@@ -330,7 +330,7 @@ export default function Hero({ onLaunchStudio }) {
       >
         <div className="badge-cream">
           <Activity size={14} color="#FFF0DC" />
-          <span>SPORTANALYTICS TACTICAL VISION ENGINE</span>
+          <span>COMPUTER VISION & TACTICAL INTELLIGENCE</span>
         </div>
       </motion.div>
 

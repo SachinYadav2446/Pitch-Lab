@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-import { ArrowRight, Menu, X } from 'lucide-react';
+import React from 'react';
+import { ArrowRight, Menu } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
   const navLinks = [
     { label: 'Novelties', href: '#vision-engine' },
     { label: 'Architecture', href: '#architecture' },
@@ -31,33 +29,24 @@ export default function Navbar({ onLaunchStudio }) {
         alignItems: 'center',
         gap: '24px'
       }}>
-        {/* Three Lines Menu Icon */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        {/* Three Lines Menu Icon (Click disabled for now) */}
+        <div
           style={{
             background: 'transparent',
             border: 'none',
             color: 'var(--burgundy-deep)',
-            cursor: 'pointer',
             padding: '4px',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            borderRadius: '6px',
-            transition: 'opacity 0.2s ease'
+            userSelect: 'none'
           }}
-          onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
-          onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
-          aria-label="Toggle Navigation Menu"
+          aria-hidden="true"
         >
-          {mobileMenuOpen ? (
-            <X size={18} color="var(--burgundy-deep)" strokeWidth={2.4} />
-          ) : (
-            <Menu size={18} color="var(--burgundy-deep)" strokeWidth={2.4} />
-          )}
-        </button>
+          <Menu size={18} color="var(--burgundy-deep)" strokeWidth={2.4} />
+        </div>
 
-        {/* Left-Centered Nav Links (Reduced Size: 0.80rem) */}
+        {/* Left-Centered Nav Links */}
         <div style={{
           display: 'flex',
           alignItems: 'center',
@@ -91,7 +80,7 @@ export default function Navbar({ onLaunchStudio }) {
         </div>
       </div>
 
-      {/* Right Action: Reduced Compact CTA Button (0.78rem) */}
+      {/* Right Action: Compact CTA Button */}
       <div style={{
         display: 'flex',
         alignItems: 'center'
@@ -110,57 +99,6 @@ export default function Navbar({ onLaunchStudio }) {
           <ArrowRight size={13} color="var(--cream-beige)" />
         </button>
       </div>
-
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          background: 'rgba(165, 167, 155, 0.98)',
-          backdropFilter: 'blur(20px)',
-          padding: '20px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '16px',
-          border: 'none',
-          boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)'
-        }}>
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                textDecoration: 'none',
-                color: 'var(--burgundy-deep)',
-                fontSize: '0.95rem',
-                fontWeight: 700
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              onLaunchStudio();
-            }}
-            className="btn-burgundy-primary"
-            style={{
-              borderRadius: '20px',
-              padding: '10px 20px',
-              fontSize: '0.85rem',
-              justifyContent: 'center',
-              border: 'none'
-            }}
-          >
-            <span>Tactical Console</span>
-            <ArrowRight size={13} color="var(--cream-beige)" />
-          </button>
-        </div>
-      )}
     </nav>
   );
 }

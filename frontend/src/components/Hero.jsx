@@ -165,7 +165,11 @@ export default function Hero({ onLaunchStudio }) {
             transformOrigin: 'top center',
             boxShadow: '-14px 0 35px rgba(0, 0, 0, 0.22), 0 0 25px rgba(89, 9, 7, 0.2)',
             borderLeft: '1.5px solid rgba(232, 210, 181, 0.3)',
-            borderRight: '1px solid rgba(232, 210, 181, 0.15)'
+            borderRight: '1px solid rgba(232, 210, 181, 0.15)',
+            overflow: 'hidden',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}>
             {/* Subtle high-tech diagonal accent line */}
             <div style={{
@@ -174,22 +178,24 @@ export default function Hero({ onLaunchStudio }) {
               bottom: 0,
               left: '20px',
               width: '1px',
-              background: 'linear-gradient(to bottom, transparent, rgba(232, 210, 181, 0.15), transparent)'
+              background: 'linear-gradient(to bottom, transparent, rgba(232, 210, 181, 0.15), transparent)',
+              zIndex: 1
             }} />
-          </div>
 
-          {/* Interior of Burgundy Slab: Tactical CV Footballer Art */}
-          <div style={{
-            position: 'relative',
-            zIndex: 6,
-            height: '100%',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '20px 10px'
-          }}>
-            <TacticalFootballerArt />
+            {/* Content counter-skewed so artwork remains upright, un-distorted & confined to this section only */}
+            <div style={{
+              transform: 'skewX(11deg)',
+              transformOrigin: 'center center',
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '60px 24px',
+              zIndex: 2
+            }}>
+              <TacticalFootballerArt />
+            </div>
           </div>
         </div>
       </div>

@@ -82,34 +82,6 @@ export default function Navbar({ onLaunchStudio }) {
           ))}
         </div>
       </div>
-
-      {/* Right Action: Button exactly as in the screenshot */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        zIndex: 101
-      }}>
-        <button
-          onClick={onLaunchStudio}
-          style={{
-            background: 'var(--cream-beige)',
-            color: 'var(--burgundy-deep)',
-            border: 'none',
-            borderRadius: '20px',
-            padding: '8px 22px',
-            fontSize: '0.80rem',
-            fontWeight: 800,
-            fontFamily: 'Space Grotesk, sans-serif',
-            cursor: 'pointer',
-            display: 'inline-flex',
-            alignItems: 'center',
-            boxShadow: '0 4px 14px rgba(0, 0, 0, 0.15)',
-            transition: 'all 0.2s ease'
-          }}
-        >
-          Tactical Console
-        </button>
-      </div>
     </nav>
   );
 }

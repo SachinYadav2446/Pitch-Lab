@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
+import VisionStudio from './components/VisionStudio';
 import HomographyFeature from './components/HomographyFeature';
 import VoronoiFeature from './components/VoronoiFeature';
 import TrackingFeature from './components/TrackingFeature';
 import JerseyClusteringFeature from './components/JerseyClusteringFeature';
 import KinematicsFeature from './components/KinematicsFeature';
+import BiomechanicsFeature from './components/BiomechanicsFeature';
 import ArchitecturePipeline from './components/ArchitecturePipeline';
 import Footer from './components/Footer';
 import FloatingChatbotButton from './components/FloatingChatbotButton';
@@ -15,7 +17,7 @@ export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   const handleLaunchStudio = () => {
-    const el = document.querySelector('#pipeline');
+    const el = document.querySelector('#vision-studio');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -37,26 +39,32 @@ export default function App() {
         {/* Section 2: Hero Section */}
         <Hero onLaunchStudio={handleLaunchStudio} />
 
-        {/* Feature 01: Planar Pitch Homography Engine */}
+        {/* Feature 01: Interactive Vision Workbench & Synchronized 2D Radar Studio */}
+        <VisionStudio />
+
+        {/* Feature 02: Planar Pitch Homography Engine */}
         <HomographyFeature />
 
-        {/* Feature 02: Dynamic Space Control & Voronoi Dominance */}
+        {/* Feature 03: Dynamic Space Control & Voronoi Dominance */}
         <VoronoiFeature />
 
-        {/* Feature 03: Deep Multi-Object Tracking & Re-ID (YOLOv8 + ByteTrack) */}
+        {/* Feature 04: Deep Multi-Object Tracking & Re-ID (YOLOv8 + ByteTrack) */}
         <TrackingFeature />
 
-        {/* Feature 04: Automated Jersey Pigment Clustering (K-Means in HSV) */}
+        {/* Feature 05: Automated Jersey Pigment Clustering (K-Means in HSV) */}
         <JerseyClusteringFeature />
 
-        {/* Feature 05: Metric Velocity & Physical Sprint Telemetry */}
+        {/* Feature 06: Metric Velocity & Physical Sprint Telemetry */}
         <KinematicsFeature />
 
-        {/* Feature 06: Production End-to-End Pipeline Architecture */}
+        {/* Feature 07: 3D Biomechanical Pose & Strike Mechanics Engine */}
+        <BiomechanicsFeature />
+
+        {/* Feature 08: Production End-to-End Pipeline Architecture */}
         <ArchitecturePipeline />
       </main>
 
-      {/* Section 7: Footer */}
+      {/* Section 9: Footer */}
       <Footer />
 
       {/* Floating AI Tactical Copilot Button (Right Side) */}

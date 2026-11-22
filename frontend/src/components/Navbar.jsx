@@ -3,11 +3,13 @@ import { ArrowRight, Menu } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const navLinks = [
+    { label: 'Vision Studio', href: '#vision-studio' },
     { label: 'Homography', href: '#homography' },
     { label: 'Space Control', href: '#space-control' },
     { label: 'Deep Tracking', href: '#tracking-engine' },
     { label: 'Pigment Clustering', href: '#clustering-engine' },
     { label: 'Kinematics', href: '#kinematics-engine' },
+    { label: '3D Biomechanics', href: '#biomechanics-engine' },
     { label: 'Pipeline', href: '#pipeline' },
   ];
 
@@ -54,7 +56,7 @@ export default function Navbar({ onLaunchStudio }) {
         <div style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '28px'
+          gap: '24px'
         }} className="hidden-mobile">
           {navLinks.map((link) => (
             <a
@@ -70,11 +72,12 @@ export default function Navbar({ onLaunchStudio }) {
               style={{
                 textDecoration: 'none',
                 color: 'var(--burgundy-deep)',
-                fontSize: '0.82rem',
+                fontSize: '0.80rem',
                 fontWeight: 700,
                 letterSpacing: '0.2px',
                 opacity: 0.88,
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
+                whiteSpace: 'nowrap'
               }}
               onMouseEnter={(e) => {
                 e.target.style.opacity = '1';

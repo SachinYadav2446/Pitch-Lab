@@ -182,16 +182,20 @@ export default function Hero({ onLaunchStudio }) {
               zIndex: 1
             }} />
 
-            {/* Content counter-skewed so artwork remains upright, un-distorted & confined to this section only */}
+            {/* Content counter-skewed and expanded to cover the entire vertical section with zero gaps */}
             <div style={{
+              position: 'absolute',
+              top: 0,
+              bottom: 0,
+              left: '-20%',
+              right: '-20%',
+              width: '140%',
+              height: '100%',
               transform: 'skewX(11deg)',
               transformOrigin: 'center center',
-              width: '100%',
-              height: '100%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '30px 20px',
               zIndex: 2
             }}>
               <TacticalFootballerArt />

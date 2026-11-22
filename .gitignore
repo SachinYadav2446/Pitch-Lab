@@ -8,6 +8,11 @@ env/
 venv/
 ENV/
 *.pt
+# Video uploads & outputs
+uploads/
+outputs/
+*.mp4
+!sample_match.mp4
 
 # Node / React
 frontend/node_modules/

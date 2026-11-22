@@ -12,7 +12,7 @@ const SYSTEMS_LIST = [
   { index: 7, num: '08', title: 'Autonomous Edge Pipeline', latency: '64.9 FPS' }
 ];
 
-export default function Navbar({ onSelectFeature }) {
+export default function Navbar({ onSelectFeature, onOpenStudio }) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const dropdownRef = useRef(null);
 
@@ -41,6 +41,10 @@ export default function Navbar({ onSelectFeature }) {
 
   const handleLinkClick = (index) => {
     setIsDrawerOpen(false);
+    if (index === 6 && onOpenStudio) {
+      onOpenStudio();
+      return;
+    }
     onSelectFeature?.(index);
   };
 

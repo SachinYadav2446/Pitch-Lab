@@ -413,7 +413,7 @@ const FEATURES_DATA = [
   }
 ];
 
-export default function FeatureExplorer({ externalFeatureIndex, onFeatureChange }) {
+export default function FeatureExplorer({ externalFeatureIndex, onFeatureChange, onOpenStudio }) {
   const [activeFeatureIndex, setActiveFeatureIndex] = useState(externalFeatureIndex ?? 0);
   const [activeSubfeatureIndex, setActiveSubfeatureIndex] = useState(0);
 
@@ -750,8 +750,32 @@ export default function FeatureExplorer({ externalFeatureIndex, onFeatureChange 
                   paddingTop: '8px',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '12px'
+                  gap: '12px',
+                  flexWrap: 'wrap'
                 }}>
+                  {currentFeature.id === 'visionstudio' && onOpenStudio && (
+                    <button
+                      onClick={onOpenStudio}
+                      style={{
+                        backgroundColor: 'var(--burgundy-deep)',
+                        color: 'var(--cream-beige)',
+                        border: 'none',
+                        borderRadius: '2px',
+                        padding: '6px 14px',
+                        fontSize: '0.74rem',
+                        fontWeight: 800,
+                        cursor: 'pointer',
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        boxShadow: '0 4px 12px rgba(89, 9, 7, 0.25)'
+                      }}
+                    >
+                      <span>Launch Neural Video Processor</span>
+                      <ArrowRight size={12} color="var(--cream-beige)" />
+                    </button>
+                  )}
+
                   {activeSubfeatureIndex < currentFeature.subfeatures.length - 1 ? (
                     <button
                       onClick={() => setActiveSubfeatureIndex(prev => prev + 1)}

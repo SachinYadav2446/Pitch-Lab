@@ -1,21 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import FeatureExplorer from './components/FeatureExplorer';
+import StudioPage from './components/StudioPage';
 import Footer from './components/Footer';
 import FloatingChatbotButton from './components/FloatingChatbotButton';
 import TacticalAiModal from './components/TacticalAiModal';
-import NeuralStudioModal from './components/NeuralStudioModal';
 
 export default function App() {
+  const [currentView, setCurrentView] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.location.hash === '#studio' ? 'studio' : 'home';
+    }
+    return 'home';
+  });
+
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
-  const [isNeuralModalOpen, setIsNeuralModalOpen] = useState(false);
   const [selectedFeatureIndex, setSelectedFeatureIndex] = useState(0);
+
+  // Sync hash changes with currentView
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentView(window.location.hash === '#studio' ? 'studio' : 'home');
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
+
+  const navigateToStudio = () => {
+    setCurrentView('studio');
+    window.location.hash = 'studio';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const navigateToHome = () => {
+    setCurrentView('home');
+    window.location.hash = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleNavSelectFeature = (index) => {
     if (index === 6) {
-      // Launch Neural Studio Workbench directly
-      setIsNeuralModalOpen(true);
+      // Jump directly to dedicated Match Analytics Studio
+      navigateToStudio();
       return;
     }
     setSelectedFeatureIndex(index);
@@ -23,10 +50,6 @@ export default function App() {
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  const handleLaunchStudio = () => {
-    setIsNeuralModalOpen(true);
   };
 
   return (
@@ -37,27 +60,39 @@ export default function App() {
       backgroundColor: 'var(--bg-sage)',
       color: 'var(--text-burgundy)'
     }}>
-      {/* Header Navigation */}
-      <Navbar 
-        onSelectFeature={handleNavSelectFeature} 
-        onOpenStudio={() => setIsNeuralModalOpen(true)}
-      />
+      {currentView === 'studio' ? (
+        /* ========================================================
+           DEDICATED FULL-PAGE ANALYTICS STUDIO WORKBENCH
+           ======================================================== */
+        <StudioPage onBackToHome={navigateToHome} />
+      ) : (
+        /* ========================================================
+           CLEAN EDITORIAL HOME / PRODUCT LANDING PAGE
+           ======================================================== */
+        <>
+          {/* Header Navigation */}
+          <Navbar 
+            onSelectFeature={handleNavSelectFeature} 
+            onOpenStudio={navigateToStudio}
+          />
 
-      {/* Main Content Flow */}
-      <main style={{ flex: 1 }}>
-        {/* Section 1: Hero Section */}
-        <Hero onLaunchStudio={handleLaunchStudio} />
+          {/* Main Content Flow */}
+          <main style={{ flex: 1 }}>
+            {/* Section 1: Hero Section */}
+            <Hero onLaunchStudio={navigateToStudio} />
 
-        {/* Section 2: Interactive Feature & Subfeature Matrix with LineSidebar */}
-        <FeatureExplorer
-          externalFeatureIndex={selectedFeatureIndex}
-          onFeatureChange={setSelectedFeatureIndex}
-          onOpenStudio={() => setIsNeuralModalOpen(true)}
-        />
-      </main>
+            {/* Section 2: Interactive Feature & Subfeature Matrix with LineSidebar */}
+            <FeatureExplorer
+              externalFeatureIndex={selectedFeatureIndex}
+              onFeatureChange={setSelectedFeatureIndex}
+              onOpenStudio={navigateToStudio}
+            />
+          </main>
 
-      {/* Single-Row Clean Footer */}
-      <Footer />
+          {/* Single-Row Clean Footer */}
+          <Footer />
+        </>
+      )}
 
       {/* Floating AI Tactical Copilot Button (Right Side) */}
       <FloatingChatbotButton onClick={() => setIsAiModalOpen(true)} />
@@ -66,12 +101,6 @@ export default function App() {
       <TacticalAiModal
         isOpen={isAiModalOpen}
         onClose={() => setIsAiModalOpen(false)}
-      />
-
-      {/* Neural Vision Studio Modal (FastAPI + YOLOv8 Video Processing) */}
-      <NeuralStudioModal
-        isOpen={isNeuralModalOpen}
-        onClose={() => setIsNeuralModalOpen(false)}
       />
     </div>
   );

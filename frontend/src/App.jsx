@@ -1,14 +1,24 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import HomographyFeature from './components/HomographyFeature';
 import VoronoiFeature from './components/VoronoiFeature';
 import TrackingFeature from './components/TrackingFeature';
+import JerseyClusteringFeature from './components/JerseyClusteringFeature';
+import KinematicsFeature from './components/KinematicsFeature';
+import ArchitecturePipeline from './components/ArchitecturePipeline';
+import Footer from './components/Footer';
 import FloatingChatbotButton from './components/FloatingChatbotButton';
+import TacticalAiModal from './components/TacticalAiModal';
 
 export default function App() {
+  const [isAiModalOpen, setIsAiModalOpen] = useState(false);
+
   const handleLaunchStudio = () => {
-    alert("Tactical Studio demo will open here once approved!");
+    const el = document.querySelector('#pipeline');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
@@ -27,18 +37,36 @@ export default function App() {
         {/* Section 2: Hero Section */}
         <Hero onLaunchStudio={handleLaunchStudio} />
 
-        {/* Section 3: Feature 1 - Planar Pitch Homography Engine */}
+        {/* Feature 01: Planar Pitch Homography Engine */}
         <HomographyFeature />
 
-        {/* Section 4: Feature 2 - Dynamic Space Control & Voronoi Dominance */}
+        {/* Feature 02: Dynamic Space Control & Voronoi Dominance */}
         <VoronoiFeature />
 
-        {/* Section 5: Feature 3 - Deep Multi-Object Tracking & Re-ID */}
+        {/* Feature 03: Deep Multi-Object Tracking & Re-ID (YOLOv8 + ByteTrack) */}
         <TrackingFeature />
+
+        {/* Feature 04: Automated Jersey Pigment Clustering (K-Means in HSV) */}
+        <JerseyClusteringFeature />
+
+        {/* Feature 05: Metric Velocity & Physical Sprint Telemetry */}
+        <KinematicsFeature />
+
+        {/* Feature 06: Production End-to-End Pipeline Architecture */}
+        <ArchitecturePipeline />
       </main>
 
-      {/* Floating AI Chatbot Button (Right Side) */}
-      <FloatingChatbotButton />
+      {/* Section 7: Footer */}
+      <Footer />
+
+      {/* Floating AI Tactical Copilot Button (Right Side) */}
+      <FloatingChatbotButton onClick={() => setIsAiModalOpen(true)} />
+
+      {/* GenAI Tactical Copilot Modal */}
+      <TacticalAiModal
+        isOpen={isAiModalOpen}
+        onClose={() => setIsAiModalOpen(false)}
+      />
     </div>
   );
 }

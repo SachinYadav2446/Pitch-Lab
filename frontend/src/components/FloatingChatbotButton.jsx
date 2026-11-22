@@ -7,7 +7,7 @@ import { MessageSquare } from 'lucide-react';
  * Adheres strictly to the PitchVision brand palette:
  * Deep Burgundy (#590907) base with Warm Cream Beige (#E8D2B5) accents and glow.
  */
-export default function FloatingChatbotButton() {
+export default function FloatingChatbotButton({ onClick }) {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -42,15 +42,15 @@ export default function FloatingChatbotButton() {
           whiteSpace: 'nowrap'
         }}
       >
-        PitchVision Assistant
+        PitchVision AI Copilot
       </div>
 
       {/* Floating Action Button */}
       <button
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        onClick={() => alert("PitchVision AI Copilot interface will open here!")}
-        aria-label="Open Chatbot"
+        onClick={onClick}
+        aria-label="Open AI Copilot"
         style={{
           position: 'relative',
           width: '54px',

@@ -6,8 +6,9 @@ export default function Navbar({ onLaunchStudio }) {
     { label: 'Homography', href: '#homography' },
     { label: 'Space Control', href: '#space-control' },
     { label: 'Deep Tracking', href: '#tracking-engine' },
-    { label: 'Pipeline', href: '#tracking-engine' },
-    { label: 'Dataset', href: '#homography' },
+    { label: 'Pigment Clustering', href: '#clustering-engine' },
+    { label: 'Kinematics', href: '#kinematics-engine' },
+    { label: 'Pipeline', href: '#pipeline' },
   ];
 
   return (

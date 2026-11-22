@@ -2,6 +2,7 @@ import React from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import HomographyFeature from './components/HomographyFeature';
+import VoronoiFeature from './components/VoronoiFeature';
 
 export default function App() {
   const handleLaunchStudio = () => {
@@ -26,6 +27,9 @@ export default function App() {
 
         {/* Section 3: Feature 1 - Planar Pitch Homography Engine */}
         <HomographyFeature />
+
+        {/* Section 4: Feature 2 - Dynamic Space Control & Voronoi Dominance */}
+        <VoronoiFeature />
       </main>
     </div>
   );

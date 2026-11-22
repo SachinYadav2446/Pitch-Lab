@@ -5,8 +5,8 @@ export default function Navbar({ onLaunchStudio }) {
   const navLinks = [
     { label: 'Homography', href: '#homography' },
     { label: 'Space Control', href: '#space-control' },
-    { label: 'Architecture', href: '#homography' },
-    { label: 'Pipeline', href: '#space-control' },
+    { label: 'Deep Tracking', href: '#tracking-engine' },
+    { label: 'Pipeline', href: '#tracking-engine' },
     { label: 'Dataset', href: '#homography' },
   ];
 

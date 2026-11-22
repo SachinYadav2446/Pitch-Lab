@@ -3,6 +3,7 @@ import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import HomographyFeature from './components/HomographyFeature';
 import VoronoiFeature from './components/VoronoiFeature';
+import TrackingFeature from './components/TrackingFeature';
 
 export default function App() {
   const handleLaunchStudio = () => {
@@ -30,6 +31,9 @@ export default function App() {
 
         {/* Section 4: Feature 2 - Dynamic Space Control & Voronoi Dominance */}
         <VoronoiFeature />
+
+        {/* Section 5: Feature 3 - Deep Multi-Object Tracking & Re-ID */}
+        <TrackingFeature />
       </main>
     </div>
   );

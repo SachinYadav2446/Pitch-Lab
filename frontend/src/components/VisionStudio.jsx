@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Pause, RotateCcw, Upload, Eye, Layers, FastForward, 
-  Maximize2, Activity, Compass, ShieldAlert, Cpu, Sparkles, Crosshair
+  Maximize2, Activity, Compass, ShieldAlert, Cpu, Sparkles, Crosshair, Radio
 } from 'lucide-react';
 
 export default function VisionStudio() {
@@ -21,16 +21,19 @@ export default function VisionStudio() {
   const [showBallTrail, setShowBallTrail] = useState(true);
   const [showOffside, setShowOffside] = useState(true);
   const [showRadarVoronoi, setShowRadarVoronoi] = useState(true);
+  const [showScanner, setShowScanner] = useState(true);
 
   // Telemetry data state
   const [telemetryFrames, setTelemetryFrames] = useState([]);
   const [currentFrameData, setCurrentFrameData] = useState(null);
 
   const videoRef = useRef(null);
-  const overlayCanvasRef = useRef(null);
+  const broadcastCanvasRef = useRef(null);
   const radarCanvasRef = useRef(null);
   const animationFrameRef = useRef(null);
   const ballHistoryRef = useRef([]);
+  const radarSweepAngleRef = useRef(0);
+  const scanLineYRef = useRef(0);
 
   // Load telemetry dataset
   useEffect(() => {
@@ -67,27 +70,28 @@ export default function VisionStudio() {
 
   // Play / Pause toggle
   const togglePlay = () => {
-    if (!videoRef.current) return;
-    if (videoRef.current.paused) {
-      videoRef.current.play().catch(() => {});
-      setIsPlaying(true);
-    } else {
-      videoRef.current.pause();
-      setIsPlaying(false);
-    }
+    setIsPlaying(prev => {
+      const next = !prev;
+      if (videoRef.current && activeSource === 'custom') {
+        if (next) videoRef.current.play().catch(() => {});
+        else videoRef.current.pause();
+      }
+      return next;
+    });
   };
 
-  // Seek video
+  // Seek video / animation
   const handleSeek = (newTime) => {
-    if (!videoRef.current) return;
-    videoRef.current.currentTime = newTime;
     setCurrentTime(newTime);
+    if (videoRef.current && activeSource === 'custom') {
+      videoRef.current.currentTime = newTime;
+    }
   };
 
   // Change speed
   const changeSpeed = (rate) => {
     setPlaybackRate(rate);
-    if (videoRef.current) {
+    if (videoRef.current && activeSource === 'custom') {
       videoRef.current.playbackRate = rate;
     }
   };
@@ -103,56 +107,155 @@ export default function VisionStudio() {
     return telemetryFrames[targetIdx];
   }, [telemetryFrames]);
 
-  // Main synchronous rendering loop
+  // Main synchronous rendering loop with rich animations
   useEffect(() => {
-    const video = videoRef.current;
-    const overlay = overlayCanvasRef.current;
-    const radar = radarCanvasRef.current;
-    if (!overlay || !radar) return;
+    const bCanvas = broadcastCanvasRef.current;
+    const rCanvas = radarCanvasRef.current;
+    if (!bCanvas || !rCanvas) return;
 
-    const oCtx = overlay.getContext('2d');
-    const rCtx = radar.getContext('2d');
+    const bCtx = bCanvas.getContext('2d');
+    const rCtx = rCanvas.getContext('2d');
+    let lastTimestamp = performance.now();
 
-    const renderStudio = () => {
-      const vTime = video ? video.currentTime : currentTime;
-      setCurrentTime(vTime);
+    const renderStudio = (timestamp) => {
+      const dt = (timestamp - lastTimestamp) / 1000;
+      lastTimestamp = timestamp;
 
+      // Update time progression if playing
+      if (isPlaying) {
+        setCurrentTime(prev => {
+          const next = prev + dt * playbackRate;
+          return next > (duration || 6.0) ? 0 : next;
+        });
+      }
+
+      // Rotate radar sweep beam
+      radarSweepAngleRef.current = (radarSweepAngleRef.current + dt * 2.2) % (Math.PI * 2);
+
+      // Move broadcast CV scanline
+      scanLineYRef.current = (scanLineYRef.current + dt * 180) % 720;
+
+      const vTime = currentTime;
       const frameData = getFrameForTime(vTime);
       if (frameData) {
         setCurrentFrameData(frameData);
       }
 
-      const vw = overlay.width;
-      const vh = overlay.height;
+      const bw = bCanvas.width;
+      const bh = bCanvas.height;
 
-      // 1. OVERLAY CANVAS (1280 x 720 coordinate space)
-      oCtx.clearRect(0, 0, vw, vh);
+      // ========================================================
+      // 1. BROADCAST VIEW (Authentic HD Grass Pitch + Tracking HUD)
+      // ========================================================
+      // Base Pitch Green
+      bCtx.fillStyle = '#1D3B24';
+      bCtx.fillRect(0, 0, bw, bh);
 
+      // Grass mowing cut stripes (12 alternating stripes)
+      const numStripes = 12;
+      const stripeW = bw / numStripes;
+      for (let s = 0; s < numStripes; s++) {
+        if (s % 2 === 0) {
+          bCtx.fillStyle = '#18331E';
+          bCtx.fillRect(s * stripeW, 40, stripeW, bh - 80);
+        }
+      }
+
+      // Pitch White Markings
+      bCtx.save();
+      bCtx.strokeStyle = 'rgba(245, 248, 245, 0.75)';
+      bCtx.lineWidth = 2.5;
+
+      // Outer Touchline Rect: x: [100, bw-100], y: [50, bh-50]
+      bCtx.strokeRect(100, 50, bw - 200, bh - 100);
+
+      // Halfway line
+      bCtx.beginPath();
+      bCtx.moveTo(bw / 2, 50);
+      bCtx.lineTo(bw / 2, bh - 50);
+      bCtx.stroke();
+
+      // Center Circle & Spot
+      bCtx.beginPath();
+      bCtx.arc(bw / 2, bh / 2, 92, 0, Math.PI * 2);
+      bCtx.stroke();
+      bCtx.beginPath();
+      bCtx.arc(bw / 2, bh / 2, 4.5, 0, Math.PI * 2);
+      bCtx.fillStyle = '#F5F8F5';
+      bCtx.fill();
+
+      // Left Penalty Box (18-yard box)
+      bCtx.strokeRect(100, 180, 180, bh - 360);
+      // Left 6-yard box
+      bCtx.strokeRect(100, 260, 60, bh - 520);
+      // Left Penalty Spot
+      bCtx.beginPath();
+      bCtx.arc(215, bh / 2, 4, 0, Math.PI * 2);
+      bCtx.fill();
+
+      // Right Penalty Box (18-yard box)
+      bCtx.strokeRect(bw - 280, 180, 180, bh - 360);
+      // Right 6-yard box
+      bCtx.strokeRect(bw - 160, 260, 60, bh - 520);
+      // Right Penalty Spot
+      bCtx.beginPath();
+      bCtx.arc(bw - 215, bh / 2, 4, 0, Math.PI * 2);
+      bCtx.fill();
+
+      // Subtle stadium floodlight vignetting
+      const grad = bCtx.createRadialGradient(bw / 2, bh / 2, 180, bw / 2, bh / 2, bw * 0.7);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.48)');
+      bCtx.fillStyle = grad;
+      bCtx.fillRect(0, 0, bw, bh);
+      bCtx.restore();
+
+      // CV Scanning Beam Animation across the broadcast feed
+      if (showScanner) {
+        bCtx.save();
+        const sy = scanLineYRef.current;
+        const scanGrad = bCtx.createLinearGradient(0, sy - 18, 0, sy + 6);
+        scanGrad.addColorStop(0, 'rgba(232, 210, 181, 0)');
+        scanGrad.addColorStop(0.8, 'rgba(232, 210, 181, 0.18)');
+        scanGrad.addColorStop(1, 'rgba(232, 210, 181, 0.65)');
+        bCtx.fillStyle = scanGrad;
+        bCtx.fillRect(100, sy - 18, bw - 200, 24);
+
+        bCtx.strokeStyle = 'rgba(232, 210, 181, 0.75)';
+        bCtx.lineWidth = 1.2;
+        bCtx.beginPath();
+        bCtx.moveTo(100, sy + 6);
+        bCtx.lineTo(bw - 100, sy + 6);
+        bCtx.stroke();
+        bCtx.restore();
+      }
+
+      // Render Telemetry Layers on Broadcast
       if (frameData && frameData.players) {
         // Offside line
         if (showOffside && frameData.offside_x) {
           const ox = frameData.offside_x;
-          oCtx.save();
-          oCtx.beginPath();
-          oCtx.setLineDash([8, 6]);
-          oCtx.strokeStyle = 'rgba(232, 210, 181, 0.75)';
-          oCtx.lineWidth = 2;
-          oCtx.moveTo(ox, 50);
-          oCtx.lineTo(ox, vh - 50);
-          oCtx.stroke();
+          bCtx.save();
+          bCtx.beginPath();
+          bCtx.setLineDash([8, 6]);
+          bCtx.strokeStyle = 'rgba(232, 210, 181, 0.9)';
+          bCtx.lineWidth = 2;
+          bCtx.moveTo(ox, 50);
+          bCtx.lineTo(ox, bh - 50);
+          bCtx.stroke();
 
           // Offside indicator flag
-          oCtx.setLineDash([]);
-          oCtx.fillStyle = '#590907';
-          oCtx.strokeStyle = '#E8D2B5';
-          oCtx.lineWidth = 1.5;
-          oCtx.fillRect(ox - 50, 24, 100, 22);
-          oCtx.strokeRect(ox - 50, 24, 100, 22);
-          oCtx.fillStyle = '#FFF6EB';
-          oCtx.font = '700 10px monospace';
-          oCtx.textAlign = 'center';
-          oCtx.fillText(`OFFSIDE: ${ox.toFixed(0)}px`, ox, 39);
-          oCtx.restore();
+          bCtx.setLineDash([]);
+          bCtx.fillStyle = '#590907';
+          bCtx.strokeStyle = '#E8D2B5';
+          bCtx.lineWidth = 1;
+          bCtx.fillRect(ox - 52, 22, 104, 22);
+          bCtx.strokeRect(ox - 52, 22, 104, 22);
+          bCtx.fillStyle = '#FFF6EB';
+          bCtx.font = '800 10px monospace';
+          bCtx.textAlign = 'center';
+          bCtx.fillText(`OFFSIDE: ${ox.toFixed(0)}px`, ox, 37);
+          bCtx.restore();
         }
 
         // Render each player's telemetry HUD
@@ -168,53 +271,80 @@ export default function VisionStudio() {
           else if (p.speed_kmh > 24) speedColor = '#F4A261';
           else if (p.speed_kmh > 18) speedColor = '#E8D2B5';
 
+          // 1. Draw Player Figure (Shirt, Shorts, Head)
+          bCtx.save();
+          // Shadow under feet
+          bCtx.fillStyle = 'rgba(0, 0, 0, 0.45)';
+          bCtx.beginPath();
+          bCtx.ellipse(p.x, p.y + 6, 10, 4, 0, 0, Math.PI * 2);
+          bCtx.fill();
+
+          // Head
+          bCtx.fillStyle = '#F5D0A9';
+          bCtx.beginPath();
+          bCtx.arc(p.x, p.y - 32, 6, 0, Math.PI * 2);
+          bCtx.fill();
+
+          // Shirt
+          bCtx.fillStyle = isAlpha ? '#8C120E' : '#1D4E89';
+          bCtx.fillRect(p.x - 8, p.y - 25, 16, 18);
+          // Team outline on shirt
+          bCtx.strokeStyle = isAlpha ? '#E8D2B5' : '#FFF';
+          bCtx.lineWidth = 1;
+          bCtx.strokeRect(p.x - 8, p.y - 25, 16, 18);
+
+          // Shorts
+          bCtx.fillStyle = isAlpha ? '#FFF' : '#152538';
+          bCtx.fillRect(p.x - 7, p.y - 7, 14, 12);
+          bCtx.restore();
+
           // A. Foot Ground Ellipse & Speed Ring
           if (showRings) {
-            oCtx.save();
-            oCtx.beginPath();
-            oCtx.ellipse(p.x, p.y + 10, 18, 7, 0, 0, Math.PI * 2);
-            oCtx.strokeStyle = isSelected ? '#FFF6EB' : speedColor;
-            oCtx.lineWidth = isSelected ? 3 : 1.8;
-            oCtx.stroke();
+            bCtx.save();
+            bCtx.beginPath();
+            bCtx.ellipse(p.x, p.y + 8, 18, 7, 0, 0, Math.PI * 2);
+            bCtx.strokeStyle = isSelected ? '#FFF6EB' : speedColor;
+            bCtx.lineWidth = isSelected ? 2.8 : 1.6;
+            bCtx.stroke();
 
             // Inner glowing disc for selected player
             if (isSelected) {
-              oCtx.fillStyle = 'rgba(232, 210, 181, 0.35)';
-              oCtx.fill();
+              bCtx.fillStyle = 'rgba(232, 210, 181, 0.35)';
+              bCtx.fill();
             }
-            oCtx.restore();
+            bCtx.restore();
           }
 
           // B. 3D Body Orientation Heading Vector
           if (showVectors && p.heading_deg !== undefined) {
-            oCtx.save();
+            bCtx.save();
             const rad = (p.heading_deg * Math.PI) / 180;
-            const arrowLen = 28;
+            const arrowLen = 26;
             const ex = p.x + Math.cos(rad) * arrowLen;
             const ey = (p.y - 12) + Math.sin(rad) * arrowLen;
 
-            oCtx.beginPath();
-            oCtx.moveTo(p.x, p.y - 12);
-            oCtx.lineTo(ex, ey);
-            oCtx.strokeStyle = isSelected ? '#FFF6EB' : accentColor;
-            oCtx.lineWidth = 2.2;
-            oCtx.stroke();
+            bCtx.beginPath();
+            bCtx.moveTo(p.x, p.y - 12);
+            bCtx.lineTo(ex, ey);
+            bCtx.strokeStyle = isSelected ? '#FFF6EB' : accentColor;
+            bCtx.lineWidth = 2;
+            bCtx.stroke();
 
-            // Vector arrowhead
+            // Arrowhead
             const headAngle = Math.PI / 6;
-            oCtx.beginPath();
-            oCtx.moveTo(ex, ey);
-            oCtx.lineTo(
-              ex - 7 * Math.cos(rad - headAngle),
-              ey - 7 * Math.sin(rad - headAngle)
+            bCtx.beginPath();
+            bCtx.moveTo(ex, ey);
+            bCtx.lineTo(
+              ex - 6 * Math.cos(rad - headAngle),
+              ey - 6 * Math.sin(rad - headAngle)
             );
-            oCtx.moveTo(ex, ey);
-            oCtx.lineTo(
-              ex - 7 * Math.cos(rad + headAngle),
-              ey - 7 * Math.sin(rad + headAngle)
+            bCtx.moveTo(ex, ey);
+            bCtx.lineTo(
+              ex - 6 * Math.cos(rad + headAngle),
+              ey - 6 * Math.sin(rad + headAngle)
             );
-            oCtx.stroke();
-            oCtx.restore();
+            bCtx.stroke();
+            bCtx.restore();
           }
 
           // C. Bounding Box & ML Confidence Tag
@@ -223,119 +353,122 @@ export default function VisionStudio() {
             const bw = bx2 - bx1;
             const bh = by2 - by1;
 
-            oCtx.save();
-            // Subtle semi-transparent box
-            oCtx.strokeStyle = isSelected ? '#FFF6EB' : (isAlpha ? 'rgba(89,9,7,0.85)' : 'rgba(29,53,87,0.85)');
-            oCtx.lineWidth = isSelected ? 2.5 : 1.5;
-            oCtx.strokeRect(bx1, by1, bw, bh);
+            bCtx.save();
+            // Subtle crisp box
+            bCtx.strokeStyle = isSelected ? '#FFF6EB' : (isAlpha ? 'rgba(140,18,14,0.75)' : 'rgba(29,78,137,0.75)');
+            bCtx.lineWidth = isSelected ? 2 : 1.2;
+            bCtx.strokeRect(bx1, by1, bw, bh);
 
-            // Corner brackets
-            const clen = 6;
-            oCtx.strokeStyle = accentColor;
-            oCtx.lineWidth = 2;
-            // Top-left
-            oCtx.beginPath();
-            oCtx.moveTo(bx1, by1 + clen);
-            oCtx.lineTo(bx1, by1);
-            oCtx.lineTo(bx1 + clen, by1);
-            oCtx.stroke();
-            // Top-right
-            oCtx.beginPath();
-            oCtx.moveTo(bx2 - clen, by1);
-            oCtx.lineTo(bx2, by1);
-            oCtx.lineTo(bx2, by1 + clen);
-            oCtx.stroke();
+            // Technical Corner Brackets
+            const clen = 5;
+            bCtx.strokeStyle = accentColor;
+            bCtx.lineWidth = 1.8;
+            bCtx.beginPath();
+            bCtx.moveTo(bx1, by1 + clen);
+            bCtx.lineTo(bx1, by1);
+            bCtx.lineTo(bx1 + clen, by1);
+            bCtx.moveTo(bx2 - clen, by1);
+            bCtx.lineTo(bx2, by1);
+            bCtx.lineTo(bx2, by1 + clen);
+            bCtx.stroke();
 
             // Tactical badge on top of player
             const label = `${p.tag} ${p.name}`;
             const subLabel = `${p.speed_kmh} km/h`;
-            oCtx.font = '700 9px monospace';
-            const labelW = Math.max(oCtx.measureText(label).width, oCtx.measureText(subLabel).width) + 12;
+            bCtx.font = '800 9px monospace';
+            const labelW = Math.max(bCtx.measureText(label).width, bCtx.measureText(subLabel).width) + 10;
 
-            oCtx.fillStyle = isSelected ? '#430504' : teamColor;
-            oCtx.fillRect(bx1 - 4, by1 - 22, labelW, 20);
-            oCtx.strokeStyle = accentColor;
-            oCtx.lineWidth = 1;
-            oCtx.strokeRect(bx1 - 4, by1 - 22, labelW, 20);
+            bCtx.fillStyle = isSelected ? '#430504' : teamColor;
+            bCtx.fillRect(bx1 - 2, by1 - 22, labelW, 20);
+            bCtx.strokeStyle = accentColor;
+            bCtx.lineWidth = 1;
+            bCtx.strokeRect(bx1 - 2, by1 - 22, labelW, 20);
 
-            oCtx.fillStyle = '#FFF6EB';
-            oCtx.textAlign = 'left';
-            oCtx.fillText(label, bx1, by1 - 11);
-            oCtx.fillStyle = speedColor;
-            oCtx.fillText(subLabel, bx1, by1 - 3);
+            bCtx.fillStyle = '#FFF6EB';
+            bCtx.textAlign = 'left';
+            bCtx.fillText(label, bx1 + 2, by1 - 11);
+            bCtx.fillStyle = speedColor;
+            bCtx.fillText(subLabel, bx1 + 2, by1 - 3);
 
-            oCtx.restore();
+            bCtx.restore();
           }
         });
 
         // D. Ball Trajectory Arc
         if (showBallTrail && frameData.ball) {
           const b = frameData.ball;
-          // Add to history
           ballHistoryRef.current.push({ x: b.x, y: b.y, time: vTime });
           if (ballHistoryRef.current.length > 25) {
             ballHistoryRef.current.shift();
           }
 
-          oCtx.save();
-          // Draw trail
+          bCtx.save();
+          // Trail
           if (ballHistoryRef.current.length > 1) {
-            oCtx.beginPath();
-            oCtx.moveTo(ballHistoryRef.current[0].x, ballHistoryRef.current[0].y);
+            bCtx.beginPath();
+            bCtx.moveTo(ballHistoryRef.current[0].x, ballHistoryRef.current[0].y);
             for (let i = 1; i < ballHistoryRef.current.length; i++) {
-              oCtx.lineTo(ballHistoryRef.current[i].x, ballHistoryRef.current[i].y);
+              bCtx.lineTo(ballHistoryRef.current[i].x, ballHistoryRef.current[i].y);
             }
-            oCtx.strokeStyle = 'rgba(212, 154, 61, 0.7)';
-            oCtx.lineWidth = 3;
-            oCtx.setLineDash([4, 3]);
-            oCtx.stroke();
+            bCtx.strokeStyle = 'rgba(212, 154, 61, 0.75)';
+            bCtx.lineWidth = 2.5;
+            bCtx.setLineDash([4, 3]);
+            bCtx.stroke();
           }
 
-          // Ball marker
-          oCtx.beginPath();
-          oCtx.arc(b.x, b.y, 7, 0, Math.PI * 2);
-          oCtx.fillStyle = '#E8D2B5';
-          oCtx.fill();
-          oCtx.strokeStyle = '#590907';
-          oCtx.lineWidth = 2;
-          oCtx.stroke();
+          // Ball Shadow
+          bCtx.fillStyle = 'rgba(0,0,0,0.5)';
+          bCtx.beginPath();
+          bCtx.ellipse(b.x, b.y + 4, 6, 3, 0, 0, Math.PI * 2);
+          bCtx.fill();
+
+          // Ball Body
+          bCtx.beginPath();
+          bCtx.arc(b.x, b.y, 6.5, 0, Math.PI * 2);
+          bCtx.fillStyle = '#FFF6EB';
+          bCtx.fill();
+          bCtx.strokeStyle = '#222';
+          bCtx.lineWidth = 1.5;
+          bCtx.stroke();
 
           // Ball speed tag
-          oCtx.fillStyle = '#430504';
-          oCtx.fillRect(b.x + 10, b.y - 18, 64, 18);
-          oCtx.strokeStyle = '#D49A3D';
-          oCtx.lineWidth = 1;
-          oCtx.strokeRect(b.x + 10, b.y - 18, 64, 18);
-          oCtx.fillStyle = '#FFF6EB';
-          oCtx.font = '700 9px monospace';
-          oCtx.textAlign = 'left';
-          oCtx.fillText(`⚽ ${b.speed_kmh}k`, b.x + 14, b.y - 5);
-          oCtx.restore();
+          bCtx.fillStyle = '#430504';
+          bCtx.fillRect(b.x + 8, b.y - 18, 62, 18);
+          bCtx.strokeStyle = '#D49A3D';
+          bCtx.lineWidth = 1;
+          bCtx.strokeRect(b.x + 8, b.y - 18, 62, 18);
+          bCtx.fillStyle = '#FFF6EB';
+          bCtx.font = '800 9px monospace';
+          bCtx.textAlign = 'left';
+          bCtx.fillText(`⚽ ${b.speed_kmh}k`, b.x + 12, b.y - 5);
+          bCtx.restore();
         }
       }
 
-      // 2. RADAR MINIMAP CANVAS (360 x 234 metric pitch: 105m x 68m)
-      const rw = radar.width;
-      const rh = radar.height;
+      // ========================================================
+      // 2. FLOATING 2D TACTICAL RADAR (NO ENCLOSING BOX!)
+      // ========================================================
+      const rw = rCanvas.width;
+      const rh = rCanvas.height;
       rCtx.clearRect(0, 0, rw, rh);
 
-      // Pitch background (Dark tactical felt)
-      rCtx.fillStyle = '#222923';
+      // Pitch background (Dark tactical felt with subtle vignette)
+      rCtx.fillStyle = '#162019';
       rCtx.fillRect(0, 0, rw, rh);
 
-      // Pitch Grass Stripes
-      const stripes = 10;
-      const sw = rw / stripes;
-      for (let s = 0; s < stripes; s++) {
+      // Grass stripes on radar
+      const rStripes = 10;
+      const rsw = rw / rStripes;
+      for (let s = 0; s < rStripes; s++) {
         if (s % 2 === 0) {
-          rCtx.fillStyle = 'rgba(255, 255, 255, 0.02)';
-          rCtx.fillRect(s * sw, 0, sw, rh);
+          rCtx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+          rCtx.fillRect(s * rsw, 0, rsw, rh);
         }
       }
 
-      // Metric coordinate mapper: (0..105m, 0..68m) -> (16..rw-16, 16..rh-16)
-      const padX = 16;
-      const padY = 16;
+      // Metric coordinate mapper
+      const padX = 14;
+      const padY = 14;
       const pitchW = rw - padX * 2;
       const pitchH = rh - padY * 2;
 
@@ -344,41 +477,29 @@ export default function VisionStudio() {
 
       // Pitch Markings
       rCtx.strokeStyle = 'rgba(232, 210, 181, 0.45)';
-      rCtx.lineWidth = 1.5;
-      // Border
+      rCtx.lineWidth = 1.2;
       rCtx.strokeRect(padX, padY, pitchW, pitchH);
+
       // Halfway line
       rCtx.beginPath();
       rCtx.moveTo(rw / 2, padY);
       rCtx.lineTo(rw / 2, rh - padY);
       rCtx.stroke();
+
       // Center circle
       rCtx.beginPath();
       rCtx.arc(rw / 2, rh / 2, pitchH * 0.18, 0, Math.PI * 2);
       rCtx.stroke();
-      // Center spot
-      rCtx.beginPath();
-      rCtx.arc(rw / 2, rh / 2, 2.5, 0, Math.PI * 2);
-      rCtx.fillStyle = 'rgba(232, 210, 181, 0.6)';
-      rCtx.fill();
 
-      // Penalty Boxes (16.5m depth, 40.3m height)
+      // Penalty Boxes
       const penBoxW = (16.5 / 105.0) * pitchW;
       const penBoxH = (40.3 / 68.0) * pitchH;
       const penBoxY = padY + (pitchH - penBoxH) / 2;
       rCtx.strokeRect(padX, penBoxY, penBoxW, penBoxH);
       rCtx.strokeRect(rw - padX - penBoxW, penBoxY, penBoxW, penBoxH);
 
-      // 6-yard boxes
-      const goalBoxW = (5.5 / 105.0) * pitchW;
-      const goalBoxH = (18.3 / 68.0) * pitchH;
-      const goalBoxY = padY + (pitchH - goalBoxH) / 2;
-      rCtx.strokeRect(padX, goalBoxY, goalBoxW, goalBoxH);
-      rCtx.strokeRect(rw - padX - goalBoxW, goalBoxY, goalBoxW, goalBoxH);
-
       // Radar Voronoi Pitch Dominance
       if (showRadarVoronoi && frameData && frameData.players) {
-        // Fast grid approximation
         const step = 8;
         const cols = Math.floor(pitchW / step);
         const rows = Math.floor(pitchH / step);
@@ -388,7 +509,6 @@ export default function VisionStudio() {
             const rx = padX + c * step + step / 2;
             const ry = padY + r * step + step / 2;
 
-            // Find closest player
             let closestDist = 999999;
             let closestTeam = null;
 
@@ -403,14 +523,41 @@ export default function VisionStudio() {
             });
 
             if (closestTeam === 'alpha') {
-              rCtx.fillStyle = 'rgba(89, 9, 7, 0.16)';
+              rCtx.fillStyle = 'rgba(89, 9, 7, 0.18)';
             } else {
-              rCtx.fillStyle = 'rgba(29, 53, 87, 0.16)';
+              rCtx.fillStyle = 'rgba(29, 53, 87, 0.18)';
             }
             rCtx.fillRect(padX + c * step, padY + r * step, step, step);
           }
         }
       }
+
+      // Active Radar Sweeper Beam (360° Circular Sweep Animation)
+      rCtx.save();
+      const sweepAngle = radarSweepAngleRef.current;
+      const sweepRadius = Math.max(rw, rh) * 0.6;
+      const sweepGrad = rCtx.createRadialGradient(rw / 2, rh / 2, 5, rw / 2, rh / 2, sweepRadius);
+      sweepGrad.addColorStop(0, 'rgba(232, 210, 181, 0.15)');
+      sweepGrad.addColorStop(1, 'rgba(232, 210, 181, 0)');
+
+      rCtx.beginPath();
+      rCtx.moveTo(rw / 2, rh / 2);
+      rCtx.arc(rw / 2, rh / 2, sweepRadius, sweepAngle - 0.35, sweepAngle);
+      rCtx.closePath();
+      rCtx.fillStyle = sweepGrad;
+      rCtx.fill();
+
+      // Sweeper Leading Ray
+      rCtx.beginPath();
+      rCtx.moveTo(rw / 2, rh / 2);
+      rCtx.lineTo(
+        rw / 2 + Math.cos(sweepAngle) * sweepRadius,
+        rh / 2 + Math.sin(sweepAngle) * sweepRadius
+      );
+      rCtx.strokeStyle = 'rgba(232, 210, 181, 0.45)';
+      rCtx.lineWidth = 1.2;
+      rCtx.stroke();
+      rCtx.restore();
 
       // Render players on radar
       if (frameData && frameData.players) {
@@ -420,32 +567,31 @@ export default function VisionStudio() {
           const isSelected = p.id === selectedPlayerId;
           const isAlpha = p.team === 'alpha';
 
-          // Player dot
           rCtx.save();
           rCtx.beginPath();
-          rCtx.arc(rx, ry, isSelected ? 6.5 : 4.5, 0, Math.PI * 2);
+          rCtx.arc(rx, ry, isSelected ? 6 : 4, 0, Math.PI * 2);
           rCtx.fillStyle = isAlpha ? '#590907' : '#1D3557';
           rCtx.fill();
           rCtx.strokeStyle = isSelected ? '#FFF6EB' : (isAlpha ? '#E8D2B5' : '#8ECAE6');
-          rCtx.lineWidth = isSelected ? 2.5 : 1.2;
+          rCtx.lineWidth = isSelected ? 2.2 : 1;
           rCtx.stroke();
 
           // Selection radar halo ring
           if (isSelected) {
             rCtx.beginPath();
-            rCtx.arc(rx, ry, 11, 0, Math.PI * 2);
-            rCtx.strokeStyle = 'rgba(232, 210, 181, 0.6)';
+            rCtx.arc(rx, ry, 10, 0, Math.PI * 2);
+            rCtx.strokeStyle = 'rgba(232, 210, 181, 0.7)';
             rCtx.setLineDash([2, 2]);
-            rCtx.lineWidth = 1.5;
+            rCtx.lineWidth = 1.2;
             rCtx.stroke();
           }
 
           // Small jersey number
           rCtx.fillStyle = '#FFF6EB';
-          rCtx.font = '700 8px sans-serif';
+          rCtx.font = '800 7px sans-serif';
           rCtx.textAlign = 'center';
           rCtx.textBaseline = 'middle';
-          rCtx.fillText(p.id.toString(), rx, ry - 9);
+          rCtx.fillText(p.id.toString(), rx, ry - 8);
           rCtx.restore();
         });
 
@@ -455,11 +601,11 @@ export default function VisionStudio() {
           const rby = toRadarY(frameData.ball.pitch_y);
           rCtx.save();
           rCtx.beginPath();
-          rCtx.arc(rbx, rby, 4, 0, Math.PI * 2);
+          rCtx.arc(rbx, rby, 3.8, 0, Math.PI * 2);
           rCtx.fillStyle = '#D49A3D';
           rCtx.fill();
           rCtx.strokeStyle = '#FFF6EB';
-          rCtx.lineWidth = 1.2;
+          rCtx.lineWidth = 1;
           rCtx.stroke();
           rCtx.restore();
         }
@@ -476,7 +622,7 @@ export default function VisionStudio() {
         cancelAnimationFrame(animationFrameRef.current);
       }
     };
-  }, [getFrameForTime, showBoxes, showRings, showVectors, showBallTrail, showOffside, showRadarVoronoi, selectedPlayerId, currentTime]);
+  }, [getFrameForTime, showBoxes, showRings, showVectors, showBallTrail, showOffside, showRadarVoronoi, showScanner, selectedPlayerId, currentTime, isPlaying, playbackRate, duration]);
 
   const selectedPlayer = currentFrameData?.players?.find(p => p.id === selectedPlayerId);
 
@@ -487,157 +633,182 @@ export default function VisionStudio() {
 
   return (
     <section id="vision-studio" style={{
-      padding: '90px 48px',
+      padding: '80px 48px 100px',
       backgroundColor: 'var(--bg-sage)',
       position: 'relative',
-      borderBottom: '1px solid rgba(89, 9, 7, 0.12)'
+      borderBottom: '1px solid rgba(89, 9, 7, 0.15)'
     }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
         
-        {/* Section Header */}
+        {/* ========================================================
+            SECTION HEADER: HIGH CONTRAST, EDITORIAL & SHARP
+            ======================================================== */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'flex-end',
-          marginBottom: '32px',
+          marginBottom: '28px',
           flexWrap: 'wrap',
           gap: '20px'
         }}>
           <div>
+            {/* High-Contrast Category Pill (Sharp 2px radius) */}
             <div style={{
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
               backgroundColor: 'var(--burgundy-deep)',
               color: 'var(--cream-bg)',
-              padding: '6px 14px',
-              borderRadius: '9999px',
-              fontSize: '0.74rem',
+              padding: '5px 12px',
+              borderRadius: '2px',
+              fontSize: '0.72rem',
               fontWeight: 800,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              marginBottom: '14px'
+              marginBottom: '12px'
             }}>
               <Activity size={13} color="var(--cream-light)" />
-              VISION WORKBENCH 01 // SYNCED CV HUD &amp; METRIC RADAR
+              <span>SYSTEM 01 // AUTONOMOUS VISION WORKBENCH</span>
             </div>
+
             <h2 style={{
-              fontSize: 'clamp(2rem, 3.2vw, 2.8rem)',
+              fontSize: 'clamp(2.1rem, 3.4vw, 3rem)',
               fontWeight: 900,
               color: 'var(--burgundy-deep)',
-              letterSpacing: '-0.02em',
-              lineHeight: 1.1,
+              letterSpacing: '-0.03em',
+              lineHeight: 1.05,
               margin: '0 0 10px 0'
             }}>
               Interactive Vision Studio &amp; Live 2D Radar
             </h2>
+
             <p style={{
               color: '#380504',
-              fontSize: '1rem',
+              fontSize: '0.98rem',
               maxWidth: '780px',
               margin: 0,
-              opacity: 0.88,
-              lineHeight: 1.55
+              opacity: 0.9,
+              lineHeight: 1.5
             }}>
               Autonomous multi-camera tracking with sub-millisecond homography projection, real-time bounding boxes, velocity vectors, and synchronous birds-eye pitch state.
             </p>
           </div>
 
-          {/* Quick HUD Metrics */}
+          {/* Floating High-Contrast HUD Specs (Sharp 2px radius) */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
-            gap: '14px'
+            gap: '10px'
           }}>
             <div style={{
-              backgroundColor: '#FAF6F0',
-              border: '1.5px solid rgba(89, 9, 7, 0.15)',
-              borderRadius: '10px',
-              padding: '10px 18px',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+              backgroundColor: 'var(--cream-light)',
+              border: '1.5px solid var(--burgundy-deep)',
+              borderRadius: '2px',
+              padding: '8px 16px',
+              textAlign: 'center'
             }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--burgundy-deep)', opacity: 0.7 }}>INFERENCE LATENCY</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: 'var(--burgundy-deep)', fontFamily: 'monospace' }}>14.8 ms</div>
+              <div style={{ fontSize: '0.66rem', fontWeight: 800, color: 'var(--burgundy-deep)', letterSpacing: '0.04em' }}>INFERENCE LATENCY</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: 'var(--burgundy-deep)', fontFamily: 'monospace' }}>14.8 ms</div>
             </div>
+
             <div style={{
-              backgroundColor: '#FAF6F0',
-              border: '1.5px solid rgba(89, 9, 7, 0.15)',
-              borderRadius: '10px',
-              padding: '10px 18px',
-              textAlign: 'center',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
+              backgroundColor: 'var(--cream-light)',
+              border: '1.5px solid var(--burgundy-deep)',
+              borderRadius: '2px',
+              padding: '8px 16px',
+              textAlign: 'center'
             }}>
-              <div style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--burgundy-deep)', opacity: 0.7 }}>THROUGHPUT</div>
-              <div style={{ fontSize: '1.25rem', fontWeight: 900, color: '#1B4965', fontFamily: 'monospace' }}>64.9 FPS</div>
+              <div style={{ fontSize: '0.66rem', fontWeight: 800, color: 'var(--burgundy-deep)', letterSpacing: '0.04em' }}>THROUGHPUT</div>
+              <div style={{ fontSize: '1.2rem', fontWeight: 900, color: '#1B4965', fontFamily: 'monospace' }}>64.9 FPS</div>
+            </div>
+
+            <div style={{
+              backgroundColor: 'var(--burgundy-deep)',
+              borderRadius: '2px',
+              padding: '8px 14px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              color: 'var(--cream-bg)'
+            }}>
+              <span style={{
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                backgroundColor: '#2A9D8F',
+                boxShadow: '0 0 8px #2A9D8F'
+              }} />
+              <span style={{ fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.05em' }}>LIVE SYNC</span>
             </div>
           </div>
         </div>
 
-        {/* Main Workbench Grid: Broadcast Screen (Left) + Tactical Radar Dock (Right) */}
+        {/* ========================================================
+            MAIN WORKBENCH: BROADCAST SCREEN (LEFT) + FLOATING RADAR HUD (RIGHT)
+            ======================================================== */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'minmax(0, 1.8fr) minmax(360px, 1fr)',
+          gridTemplateColumns: 'minmax(0, 1.85fr) minmax(360px, 1fr)',
           gap: '24px',
           alignItems: 'start'
         }}>
           
-          {/* LEFT: Broadcast Video Player with Canvas Overlay */}
+          {/* LEFT: Broadcast Video / Synthetic Simulation View */}
           <div style={{
             backgroundColor: 'var(--burgundy-deep)',
-            borderRadius: '16px',
+            borderRadius: '2px', // Sharp architectural radius
             overflow: 'hidden',
-            boxShadow: '0 20px 40px rgba(89, 9, 7, 0.22)',
-            border: '2px solid rgba(232, 210, 181, 0.2)',
+            boxShadow: '0 16px 36px rgba(89, 9, 7, 0.2)',
+            border: '1.5px solid rgba(89, 9, 7, 0.3)',
             display: 'flex',
             flexDirection: 'column'
           }}>
-            {/* Top Toolbar */}
+            {/* Top Toolbar (High contrast, bright text) */}
             <div style={{
-              padding: '12px 20px',
-              borderBottom: '1px solid rgba(232, 210, 181, 0.15)',
+              padding: '10px 18px',
+              borderBottom: '1px solid rgba(232, 210, 181, 0.2)',
               display: 'flex',
               justifyContent: 'space-between',
               alignItems: 'center',
-              backgroundColor: 'rgba(0,0,0,0.2)'
+              backgroundColor: '#430504'
             }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <span style={{
                   display: 'inline-block',
-                  width: '9px',
-                  height: '9px',
+                  width: '8px',
+                  height: '8px',
                   borderRadius: '50%',
                   backgroundColor: '#E63946',
-                  boxShadow: '0 0 8px #E63946'
+                  boxShadow: '0 0 6px #E63946'
                 }} />
                 <span style={{
-                  color: 'var(--cream-light)',
-                  fontSize: '0.78rem',
+                  color: 'var(--cream-bg)',
+                  fontSize: '0.76rem',
                   fontWeight: 800,
-                  letterSpacing: '0.06em',
+                  letterSpacing: '0.08em',
                   textTransform: 'uppercase'
                 }}>
-                  {activeSource === 'sample' ? 'BROADCAST TACTICAL FEED (1080P // YOLOv8)' : `CUSTOM STREAM: ${customFileName}`}
+                  {activeSource === 'sample' ? 'BROADCAST TACTICAL FEED (1080P // YOLOv8)' : `CUSTOM FEED: ${customFileName}`}
                 </span>
               </div>
 
-              {/* Upload Match Video Button */}
+              {/* Upload Match Video Button (Sharp 2px radius) */}
               <label style={{
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '6px',
-                backgroundColor: 'rgba(232, 210, 181, 0.12)',
+                backgroundColor: 'rgba(232, 210, 181, 0.15)',
                 color: 'var(--cream-bg)',
-                padding: '6px 12px',
-                borderRadius: '8px',
-                fontSize: '0.74rem',
-                fontWeight: 700,
-                border: '1px solid rgba(232, 210, 181, 0.3)',
-                transition: 'all 0.2s'
+                padding: '5px 12px',
+                borderRadius: '2px',
+                fontSize: '0.72rem',
+                fontWeight: 800,
+                border: '1px solid rgba(232, 210, 181, 0.35)',
+                transition: 'all 0.15s'
               }}>
-                <Upload size={13} />
-                Load Match Video
+                <Upload size={12} color="var(--cream-light)" />
+                <span>Load Match Video</span>
                 <input
                   type="file"
                   accept="video/mp4,video/webm,video/quicktime"
@@ -652,84 +823,86 @@ export default function VisionStudio() {
               position: 'relative',
               width: '100%',
               aspectRatio: '16/9',
-              backgroundColor: '#0c120e',
+              backgroundColor: '#16281B',
               overflow: 'hidden'
             }}>
-              {/* HTML5 Video Element */}
-              <video
-                ref={videoRef}
-                src={customVideoUrl || "/sample_match.mp4"}
-                autoPlay
-                loop
-                muted
-                playsInline
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'contain',
-                  display: 'block'
-                }}
-                onTimeUpdate={() => {
-                  if (videoRef.current) {
-                    setCurrentTime(videoRef.current.currentTime);
-                  }
-                }}
-              />
+              {/* Optional Custom Video Element */}
+              {activeSource === 'custom' && customVideoUrl && (
+                <video
+                  ref={videoRef}
+                  src={customVideoUrl}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'contain'
+                  }}
+                  onTimeUpdate={() => {
+                    if (videoRef.current) {
+                      setCurrentTime(videoRef.current.currentTime);
+                    }
+                  }}
+                />
+              )}
 
-              {/* Real-time Telemetry Canvas (exact 1280x720 canvas matching simulation coordinate space) */}
+              {/* Real-time Broadcast Telemetry Canvas */}
               <canvas
-                ref={overlayCanvasRef}
+                ref={broadcastCanvasRef}
                 width={1280}
                 height={720}
                 style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
                   width: '100%',
                   height: '100%',
-                  pointerEvents: 'none'
+                  display: 'block'
                 }}
               />
 
-              {/* Top-Right HUD Pill */}
+              {/* Top-Right HUD Badge */}
               <div style={{
                 position: 'absolute',
-                top: '14px',
-                right: '16px',
-                backgroundColor: 'rgba(67, 5, 4, 0.85)',
+                top: '12px',
+                right: '14px',
+                backgroundColor: 'rgba(67, 5, 4, 0.9)',
                 backdropFilter: 'blur(8px)',
-                border: '1px solid rgba(232, 210, 181, 0.25)',
-                borderRadius: '8px',
-                padding: '6px 12px',
+                border: '1px solid rgba(232, 210, 181, 0.3)',
+                borderRadius: '2px',
+                padding: '5px 10px',
                 color: 'var(--cream-bg)',
                 fontFamily: 'monospace',
-                fontSize: '0.74rem',
+                fontSize: '0.72rem',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px'
               }}>
                 <Cpu size={12} color="#E8D2B5" />
-                <span>MODEL: YOLOv8x-MOT</span>
+                <span>YOLOv8x-MOT</span>
                 <span style={{ opacity: 0.4 }}>|</span>
                 <span style={{ color: '#94D2BD' }}>TRACKS: {currentFrameData?.players?.length || 22}</span>
               </div>
             </div>
 
-            {/* Custom Tactical Playback Controls Bar */}
+            {/* Tactical Playback Controls Bar */}
             <div style={{
-              padding: '14px 20px',
+              padding: '12px 18px',
               backgroundColor: '#430504',
               display: 'flex',
               flexDirection: 'column',
-              gap: '10px'
+              gap: '8px',
+              borderTop: '1px solid rgba(232, 210, 181, 0.15)'
             }}>
               {/* Timeline Scrubber */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <span style={{
                   color: 'var(--cream-light)',
                   fontFamily: 'monospace',
                   fontSize: '0.74rem',
-                  fontWeight: 700,
+                  fontWeight: 800,
                   minWidth: '56px'
                 }}>
                   00:{currentTime.toFixed(2).padStart(5, '0')}
@@ -750,7 +923,7 @@ export default function VisionStudio() {
                 />
 
                 <span style={{
-                  color: 'rgba(232, 210, 181, 0.6)',
+                  color: 'rgba(232, 210, 181, 0.7)',
                   fontFamily: 'monospace',
                   fontSize: '0.74rem',
                   minWidth: '56px',
@@ -760,53 +933,52 @@ export default function VisionStudio() {
                 </span>
               </div>
 
-              {/* Action Buttons & Rate Selectors */}
+              {/* Action Buttons & Layer Selectors */}
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                gap: '12px'
+                gap: '10px'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <button
                     onClick={togglePlay}
                     style={{
                       backgroundColor: 'var(--cream-bg)',
                       color: 'var(--burgundy-deep)',
                       border: 'none',
-                      borderRadius: '8px',
-                      padding: '8px 16px',
-                      fontWeight: 800,
-                      fontSize: '0.8rem',
+                      borderRadius: '2px',
+                      padding: '6px 14px',
+                      fontWeight: 900,
+                      fontSize: '0.76rem',
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '6px',
-                      cursor: 'pointer',
-                      boxShadow: '0 2px 6px rgba(0,0,0,0.2)'
+                      gap: '5px',
+                      cursor: 'pointer'
                     }}
                   >
-                    {isPlaying ? <Pause size={14} /> : <Play size={14} />}
+                    {isPlaying ? <Pause size={13} /> : <Play size={13} />}
                     {isPlaying ? 'Pause' : 'Play'}
                   </button>
 
                   <button
                     onClick={() => handleSeek(0)}
                     style={{
-                      backgroundColor: 'rgba(232, 210, 181, 0.12)',
+                      backgroundColor: 'rgba(232, 210, 181, 0.15)',
                       color: 'var(--cream-bg)',
-                      border: '1px solid rgba(232, 210, 181, 0.25)',
-                      borderRadius: '8px',
-                      padding: '8px 12px',
-                      fontWeight: 700,
-                      fontSize: '0.78rem',
+                      border: '1px solid rgba(232, 210, 181, 0.3)',
+                      borderRadius: '2px',
+                      padding: '6px 10px',
+                      fontWeight: 800,
+                      fontSize: '0.74rem',
                       display: 'flex',
                       alignItems: 'center',
                       gap: '4px',
                       cursor: 'pointer'
                     }}
                   >
-                    <RotateCcw size={13} />
+                    <RotateCcw size={12} />
                     Rewind
                   </button>
 
@@ -814,9 +986,9 @@ export default function VisionStudio() {
                   <div style={{
                     display: 'flex',
                     backgroundColor: 'rgba(0,0,0,0.3)',
-                    borderRadius: '8px',
+                    borderRadius: '2px',
                     padding: '2px',
-                    border: '1px solid rgba(232, 210, 181, 0.15)'
+                    border: '1px solid rgba(232, 210, 181, 0.2)'
                   }}>
                     {[0.5, 1.0, 2.0].map((rate) => (
                       <button
@@ -826,12 +998,11 @@ export default function VisionStudio() {
                           backgroundColor: playbackRate === rate ? 'var(--cream-bg)' : 'transparent',
                           color: playbackRate === rate ? 'var(--burgundy-deep)' : 'var(--cream-bg)',
                           border: 'none',
-                          borderRadius: '6px',
-                          padding: '4px 10px',
-                          fontSize: '0.72rem',
+                          borderRadius: '2px',
+                          padding: '3px 8px',
+                          fontSize: '0.7rem',
                           fontWeight: 800,
-                          cursor: 'pointer',
-                          transition: 'all 0.15s'
+                          cursor: 'pointer'
                         }}
                       >
                         {rate}x
@@ -840,128 +1011,103 @@ export default function VisionStudio() {
                   </div>
                 </div>
 
-                {/* Telemetry Layer Toggles */}
+                {/* Layer Toggles (Sharp 2px radius) */}
                 <div style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   flexWrap: 'wrap'
                 }}>
-                  <button
-                    onClick={() => setShowBoxes(!showBoxes)}
-                    style={{
-                      backgroundColor: showBoxes ? 'rgba(232, 210, 181, 0.22)' : 'transparent',
-                      color: showBoxes ? 'var(--cream-light)' : 'rgba(232, 210, 181, 0.5)',
-                      border: `1px solid ${showBoxes ? 'rgba(232, 210, 181, 0.5)' : 'rgba(232, 210, 181, 0.15)'}`,
-                      borderRadius: '6px',
-                      padding: '4px 10px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    BBoxes
-                  </button>
-
-                  <button
-                    onClick={() => setShowRings(!showRings)}
-                    style={{
-                      backgroundColor: showRings ? 'rgba(232, 210, 181, 0.22)' : 'transparent',
-                      color: showRings ? 'var(--cream-light)' : 'rgba(232, 210, 181, 0.5)',
-                      border: `1px solid ${showRings ? 'rgba(232, 210, 181, 0.5)' : 'rgba(232, 210, 181, 0.15)'}`,
-                      borderRadius: '6px',
-                      padding: '4px 10px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Speed Rings
-                  </button>
-
-                  <button
-                    onClick={() => setShowVectors(!showVectors)}
-                    style={{
-                      backgroundColor: showVectors ? 'rgba(232, 210, 181, 0.22)' : 'transparent',
-                      color: showVectors ? 'var(--cream-light)' : 'rgba(232, 210, 181, 0.5)',
-                      border: `1px solid ${showVectors ? 'rgba(232, 210, 181, 0.5)' : 'rgba(232, 210, 181, 0.15)'}`,
-                      borderRadius: '6px',
-                      padding: '4px 10px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Heading Vectors
-                  </button>
-
-                  <button
-                    onClick={() => setShowOffside(!showOffside)}
-                    style={{
-                      backgroundColor: showOffside ? 'rgba(232, 210, 181, 0.22)' : 'transparent',
-                      color: showOffside ? 'var(--cream-light)' : 'rgba(232, 210, 181, 0.5)',
-                      border: `1px solid ${showOffside ? 'rgba(232, 210, 181, 0.5)' : 'rgba(232, 210, 181, 0.15)'}`,
-                      borderRadius: '6px',
-                      padding: '4px 10px',
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      cursor: 'pointer'
-                    }}
-                  >
-                    Offside Line
-                  </button>
+                  {[
+                    { label: 'BBoxes', state: showBoxes, setter: setShowBoxes },
+                    { label: 'Speed Rings', state: showRings, setter: setShowRings },
+                    { label: 'Heading', state: showVectors, setter: setShowVectors },
+                    { label: 'Offside Line', state: showOffside, setter: setShowOffside },
+                    { label: 'CV Scan', state: showScanner, setter: setShowScanner }
+                  ].map(layer => (
+                    <button
+                      key={layer.label}
+                      onClick={() => layer.setter(!layer.state)}
+                      style={{
+                        backgroundColor: layer.state ? 'rgba(232, 210, 181, 0.22)' : 'transparent',
+                        color: layer.state ? 'var(--cream-light)' : 'rgba(232, 210, 181, 0.55)',
+                        border: `1px solid ${layer.state ? 'rgba(232, 210, 181, 0.6)' : 'rgba(232, 210, 181, 0.18)'}`,
+                        borderRadius: '2px',
+                        padding: '4px 8px',
+                        fontSize: '0.7rem',
+                        fontWeight: 700,
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {layer.label}
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* RIGHT: Synchronized 2D Pitch Radar Studio */}
+          {/* ========================================================
+              RIGHT: FLOATING TACTICAL RADAR STUDIO (NOT INSIDE A BOX!)
+              - Floating directly on the sage canvas
+              - 360° rotating radar sweep line
+              - Floating tactical stat chips & telemetry capsule
+              ======================================================== */}
           <div style={{
-            backgroundColor: '#FAF6F0',
-            borderRadius: '16px',
-            border: '2px solid rgba(89, 9, 7, 0.15)',
-            boxShadow: '0 12px 30px rgba(0,0,0,0.06)',
-            overflow: 'hidden',
             display: 'flex',
-            flexDirection: 'column'
+            flexDirection: 'column',
+            gap: '14px'
           }}>
-            {/* Radar Header */}
+            {/* Floating Radar Header Strip */}
             <div style={{
-              padding: '16px 20px',
-              backgroundColor: 'var(--burgundy-deep)',
-              color: 'var(--cream-bg)',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              padding: '4px 2px'
             }}>
               <div>
-                <div style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--cream-light)', opacity: 0.8, letterSpacing: '0.08em' }}>
-                  SYNCHRONOUS PLANAR HOMOGRAPHY
-                </div>
-                <div style={{ fontSize: '1rem', fontWeight: 900, color: 'var(--cream-bg)' }}>
-                  Live 2D Pitch Radar (105m &times; 68m)
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.68rem',
+                  fontWeight: 800,
+                  color: 'var(--burgundy-deep)',
+                  letterSpacing: '0.08em'
+                }}>
+                  <Radio size={12} color="var(--burgundy-deep)" />
+                  LIVE PLANAR RADAR (105m &times; 68m)
                 </div>
               </div>
 
+              {/* Voronoi Dominance Pill */}
               <button
                 onClick={() => setShowRadarVoronoi(!showRadarVoronoi)}
                 style={{
-                  backgroundColor: showRadarVoronoi ? 'var(--cream-bg)' : 'rgba(232, 210, 181, 0.15)',
-                  color: showRadarVoronoi ? 'var(--burgundy-deep)' : 'var(--cream-bg)',
-                  border: '1px solid rgba(232, 210, 181, 0.3)',
-                  borderRadius: '6px',
-                  padding: '5px 10px',
-                  fontSize: '0.7rem',
+                  backgroundColor: showRadarVoronoi ? 'var(--burgundy-deep)' : 'transparent',
+                  color: showRadarVoronoi ? 'var(--cream-bg)' : 'var(--burgundy-deep)',
+                  border: '1.5px solid var(--burgundy-deep)',
+                  borderRadius: '2px',
+                  padding: '4px 10px',
+                  fontSize: '0.68rem',
                   fontWeight: 800,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  letterSpacing: '0.04em'
                 }}
               >
-                {showRadarVoronoi ? 'Voronoi: ON' : 'Voronoi: OFF'}
+                {showRadarVoronoi ? 'VORONOI: ACTIVE' : 'VORONOI: OFF'}
               </button>
             </div>
 
-            {/* Radar Canvas Container */}
-            <div style={{ padding: '20px', backgroundColor: '#1A211C' }}>
+            {/* Floating Radar Canvas (Sharp 2px border, No outer box container!) */}
+            <div style={{
+              position: 'relative',
+              borderRadius: '2px',
+              overflow: 'hidden',
+              boxShadow: '0 12px 28px rgba(0,0,0,0.18)',
+              border: '1.5px solid var(--burgundy-deep)',
+              backgroundColor: '#162019'
+            }}>
               <canvas
                 ref={radarCanvasRef}
                 width={360}
@@ -969,137 +1115,173 @@ export default function VisionStudio() {
                 style={{
                   width: '100%',
                   aspectRatio: '360/234',
-                  borderRadius: '10px',
-                  border: '1.5px solid rgba(232, 210, 181, 0.25)',
                   display: 'block'
                 }}
               />
 
-              {/* Radar Legend */}
+              {/* Floating Radar Legend Overlay */}
               <div style={{
+                position: 'absolute',
+                bottom: '8px',
+                left: '10px',
+                right: '10px',
                 display: 'flex',
                 justifyContent: 'space-between',
-                marginTop: '12px',
-                fontSize: '0.72rem',
+                fontSize: '0.68rem',
                 color: 'var(--cream-light)',
-                fontWeight: 700
+                fontWeight: 800,
+                backgroundColor: 'rgba(0,0,0,0.65)',
+                backdropFilter: 'blur(4px)',
+                padding: '4px 8px',
+                borderRadius: '2px',
+                border: '1px solid rgba(232, 210, 181, 0.15)'
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#590907', border: '1px solid #E8D2B5' }} />
-                  <span>Team Alpha (Red)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#590907', border: '1px solid #E8D2B5' }} />
+                  <span>Alpha (Red)</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#1D3557', border: '1px solid #8ECAE6' }} />
-                  <span>Team Beta (Blue)</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#1D3557', border: '1px solid #8ECAE6' }} />
+                  <span>Beta (Blue)</span>
                 </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#D49A3D', border: '1px solid #FFF' }} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#D49A3D', border: '1px solid #FFF' }} />
                   <span>Ball</span>
                 </div>
               </div>
             </div>
 
-            {/* Possession & Space Dominance Bar */}
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid rgba(89, 9, 7, 0.1)' }}>
+            {/* Floating Possession Strip (No card wrapper!) */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              padding: '2px 0'
+            }}>
               <div style={{
                 display: 'flex',
                 justifyContent: 'space-between',
-                fontSize: '0.76rem',
-                fontWeight: 800,
+                fontSize: '0.74rem',
+                fontWeight: 900,
                 color: 'var(--burgundy-deep)',
-                marginBottom: '6px'
+                letterSpacing: '0.04em'
               }}>
                 <span>TEAM ALPHA {currentFrameData?.possession?.alpha || 54.0}%</span>
-                <span>POSSESSION</span>
+                <span style={{ opacity: 0.6, fontSize: '0.68rem' }}>POSSESSION RATIO</span>
                 <span>TEAM BETA {currentFrameData?.possession?.beta || 46.0}%</span>
               </div>
+
+              {/* Animated split bar with sharp 2px radius */}
               <div style={{
                 width: '100%',
-                height: '8px',
-                borderRadius: '9999px',
+                height: '7px',
+                borderRadius: '2px',
                 backgroundColor: '#1D3557',
                 overflow: 'hidden',
-                display: 'flex'
+                display: 'flex',
+                border: '1px solid rgba(89, 9, 7, 0.25)'
               }}>
                 <div style={{
                   width: `${currentFrameData?.possession?.alpha || 54}%`,
                   height: '100%',
                   backgroundColor: 'var(--burgundy-deep)',
-                  transition: 'width 0.3s ease'
+                  transition: 'width 0.2s ease'
                 }} />
               </div>
             </div>
 
-            {/* Selected Player Telemetry Card */}
-            <div style={{ padding: '16px 20px', flex: 1 }}>
+            {/* Floating Inspected Target Capsule (Sharp 2px radius, translucent, no heavy box) */}
+            <div style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.85)',
+              backdropFilter: 'blur(8px)',
+              border: '1.5px solid var(--burgundy-deep)',
+              borderRadius: '2px',
+              padding: '12px 16px',
+              boxShadow: '0 4px 14px rgba(89, 9, 7, 0.08)'
+            }}>
               <div style={{
-                fontSize: '0.7rem',
-                fontWeight: 800,
-                color: 'var(--burgundy-deep)',
-                letterSpacing: '0.06em',
-                marginBottom: '10px'
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: '8px'
               }}>
-                INSPECTED TARGET TELEMETRY
+                <div style={{
+                  fontSize: '0.68rem',
+                  fontWeight: 900,
+                  color: 'var(--burgundy-deep)',
+                  letterSpacing: '0.08em',
+                  textTransform: 'uppercase'
+                }}>
+                  TARGET KINEMATICS
+                </div>
+
+                {selectedPlayer && (
+                  <span style={{
+                    backgroundColor: selectedPlayer.team === 'alpha' ? 'var(--burgundy-deep)' : '#1D3557',
+                    color: '#FFF6EB',
+                    padding: '2px 8px',
+                    borderRadius: '2px',
+                    fontSize: '0.68rem',
+                    fontWeight: 800
+                  }}>
+                    {selectedPlayer.tag} &bull; {selectedPlayer.role}
+                  </span>
+                )}
               </div>
 
               {selectedPlayer ? (
-                <div style={{
-                  backgroundColor: '#FFF',
-                  border: '1.5px solid rgba(89, 9, 7, 0.15)',
-                  borderRadius: '10px',
-                  padding: '12px 14px'
-                }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                    <div>
-                      <span style={{
-                        display: 'inline-block',
-                        backgroundColor: selectedPlayer.team === 'alpha' ? 'var(--burgundy-deep)' : '#1D3557',
-                        color: '#FFF6EB',
-                        padding: '2px 6px',
-                        borderRadius: '4px',
-                        fontSize: '0.7rem',
-                        fontWeight: 800,
-                        marginRight: '6px'
-                      }}>
-                        {selectedPlayer.tag}
-                      </span>
-                      <strong style={{ fontSize: '0.95rem', color: 'var(--burgundy-deep)' }}>{selectedPlayer.name}</strong>
-                    </div>
+                <div>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'baseline',
+                    marginBottom: '8px'
+                  }}>
+                    <strong style={{ fontSize: '1.05rem', color: 'var(--burgundy-deep)', fontWeight: 900 }}>
+                      {selectedPlayer.name}
+                    </strong>
                     <span style={{
-                      backgroundColor: 'rgba(89, 9, 7, 0.08)',
-                      color: 'var(--burgundy-deep)',
-                      padding: '2px 8px',
-                      borderRadius: '9999px',
-                      fontSize: '0.7rem',
-                      fontWeight: 800
+                      fontSize: '1.15rem',
+                      fontWeight: 900,
+                      color: '#E63946',
+                      fontFamily: 'monospace'
                     }}>
-                      {selectedPlayer.role}
+                      {selectedPlayer.speed_kmh} <span style={{ fontSize: '0.7rem' }}>km/h</span>
                     </span>
                   </div>
 
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: '8px',
+                    gridTemplateColumns: 'repeat(2, 1fr)',
+                    gap: '6px',
                     textAlign: 'center'
                   }}>
-                    <div style={{ backgroundColor: '#FAF6F0', padding: '6px', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '0.62rem', color: '#666', fontWeight: 700 }}>SPEED</div>
-                      <div style={{ fontSize: '0.88rem', fontWeight: 900, color: '#E63946' }}>{selectedPlayer.speed_kmh} <span style={{ fontSize: '0.65rem' }}>km/h</span></div>
+                    <div style={{
+                      backgroundColor: 'rgba(89, 9, 7, 0.06)',
+                      padding: '6px',
+                      borderRadius: '2px'
+                    }}>
+                      <div style={{ fontSize: '0.62rem', color: '#555', fontWeight: 800 }}>PITCH METRIC</div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 900, color: 'var(--burgundy-deep)', fontFamily: 'monospace' }}>
+                        ({selectedPlayer.pitch_x}m, {selectedPlayer.pitch_y}m)
+                      </div>
                     </div>
-                    <div style={{ backgroundColor: '#FAF6F0', padding: '6px', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '0.62rem', color: '#666', fontWeight: 700 }}>PITCH POS</div>
-                      <div style={{ fontSize: '0.82rem', fontWeight: 900, color: 'var(--burgundy-deep)' }}>({selectedPlayer.pitch_x}m, {selectedPlayer.pitch_y}m)</div>
-                    </div>
-                    <div style={{ backgroundColor: '#FAF6F0', padding: '6px', borderRadius: '6px' }}>
-                      <div style={{ fontSize: '0.62rem', color: '#666', fontWeight: 700 }}>HEADING</div>
-                      <div style={{ fontSize: '0.88rem', fontWeight: 900, color: '#1B4965' }}>{selectedPlayer.heading_deg}&deg;</div>
+
+                    <div style={{
+                      backgroundColor: 'rgba(89, 9, 7, 0.06)',
+                      padding: '6px',
+                      borderRadius: '2px'
+                    }}>
+                      <div style={{ fontSize: '0.62rem', color: '#555', fontWeight: 800 }}>HEADING ANGLE</div>
+                      <div style={{ fontSize: '0.82rem', fontWeight: 900, color: '#1B4965', fontFamily: 'monospace' }}>
+                        {selectedPlayer.heading_deg}&deg;
+                      </div>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div style={{ color: '#888', fontSize: '0.8rem', textAlign: 'center', padding: '16px' }}>
-                  Click any player in leaderboard below to inspect
+                <div style={{ color: '#666', fontSize: '0.76rem', textAlign: 'center', padding: '10px' }}>
+                  Click any player in leaderboard below to track
                 </div>
               )}
             </div>
@@ -1107,41 +1289,46 @@ export default function VisionStudio() {
           </div>
         </div>
 
-        {/* BOTTOM: Live Physical Sprint Leaderboard */}
+        {/* ========================================================
+            BOTTOM: INSTANT SPRINT LEADERBOARD (SHARP 2PX RADIUS)
+            ======================================================== */}
         <div style={{
           marginTop: '24px',
-          backgroundColor: '#FAF6F0',
-          borderRadius: '14px',
-          border: '1.5px solid rgba(89, 9, 7, 0.15)',
-          padding: '20px 24px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.03)'
+          backgroundColor: 'rgba(255, 255, 255, 0.75)',
+          backdropFilter: 'blur(6px)',
+          borderRadius: '2px', // Sharp radius
+          border: '1.5px solid var(--burgundy-deep)',
+          padding: '16px 20px',
+          boxShadow: '0 4px 14px rgba(89, 9, 7, 0.06)'
         }}>
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '14px'
+            marginBottom: '12px'
           }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Crosshair size={16} color="var(--burgundy-deep)" />
+              <Crosshair size={15} color="var(--burgundy-deep)" />
               <h3 style={{
                 margin: 0,
-                fontSize: '1rem',
+                fontSize: '0.92rem',
                 fontWeight: 900,
-                color: 'var(--burgundy-deep)'
+                color: 'var(--burgundy-deep)',
+                letterSpacing: '0.02em',
+                textTransform: 'uppercase'
               }}>
                 Instant Physical Telemetry Leaderboard (Top Sprints at 00:{currentTime.toFixed(2)})
               </h3>
             </div>
-            <span style={{ fontSize: '0.74rem', color: 'var(--burgundy-deep)', opacity: 0.75, fontWeight: 700 }}>
-              Click any athlete card to pin tracking spotlight
+            <span style={{ fontSize: '0.72rem', color: 'var(--burgundy-deep)', opacity: 0.8, fontWeight: 800 }}>
+              Click any card to pin target tracking spotlight
             </span>
           </div>
 
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))',
-            gap: '12px'
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+            gap: '10px'
           }}>
             {sortedPlayers.map((player) => {
               const isSelected = player.id === selectedPlayerId;
@@ -1154,47 +1341,46 @@ export default function VisionStudio() {
                   style={{
                     backgroundColor: isSelected ? 'var(--burgundy-deep)' : '#FFFFFF',
                     color: isSelected ? 'var(--cream-bg)' : 'var(--burgundy-deep)',
-                    border: `1.5px solid ${isSelected ? 'var(--burgundy-deep)' : 'rgba(89, 9, 7, 0.15)'}`,
-                    borderRadius: '10px',
-                    padding: '12px 14px',
+                    border: `1.5px solid ${isSelected ? 'var(--burgundy-deep)' : 'rgba(89, 9, 7, 0.2)'}`,
+                    borderRadius: '2px', // Sharp 2px radius
+                    padding: '10px 12px',
                     cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    boxShadow: isSelected ? '0 4px 12px rgba(89, 9, 7, 0.25)' : 'none'
+                    transition: 'all 0.15s ease'
                   }}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
                     <span style={{
-                      fontSize: '0.72rem',
+                      fontSize: '0.7rem',
                       fontWeight: 800,
-                      opacity: isSelected ? 0.9 : 0.6
+                      opacity: isSelected ? 0.9 : 0.65
                     }}>
                       {player.tag} &bull; {player.role}
                     </span>
                     <span style={{
-                      fontSize: '0.68rem',
+                      fontSize: '0.65rem',
                       fontWeight: 800,
                       backgroundColor: isAlpha ? 'rgba(89, 9, 7, 0.12)' : 'rgba(29, 53, 87, 0.12)',
                       color: isSelected ? 'var(--cream-light)' : (isAlpha ? '#590907' : '#1D3557'),
-                      padding: '2px 6px',
-                      borderRadius: '4px'
+                      padding: '1px 5px',
+                      borderRadius: '2px'
                     }}>
                       {isAlpha ? 'Alpha' : 'Beta'}
                     </span>
                   </div>
 
-                  <div style={{ fontSize: '0.95rem', fontWeight: 900, marginBottom: '6px' }}>
+                  <div style={{ fontSize: '0.9rem', fontWeight: 900, marginBottom: '4px' }}>
                     {player.name}
                   </div>
 
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-                    <span style={{ fontSize: '0.7rem', opacity: isSelected ? 0.8 : 0.6 }}>Current Speed</span>
+                    <span style={{ fontSize: '0.68rem', opacity: isSelected ? 0.8 : 0.6 }}>Velocity</span>
                     <span style={{
                       fontSize: '1.05rem',
                       fontWeight: 900,
                       color: isSelected ? '#E8D2B5' : '#E63946',
                       fontFamily: 'monospace'
                     }}>
-                      {player.speed_kmh} <span style={{ fontSize: '0.7rem' }}>km/h</span>
+                      {player.speed_kmh} <span style={{ fontSize: '0.68rem' }}>km/h</span>
                     </span>
                   </div>
                 </div>

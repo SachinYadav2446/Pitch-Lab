@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
-import FeaturesShowcase from './components/FeaturesShowcase';
+import FeatureExplorer from './components/FeatureExplorer';
 import Footer from './components/Footer';
 import FloatingChatbotButton from './components/FloatingChatbotButton';
 import TacticalAiModal from './components/TacticalAiModal';
@@ -10,7 +10,7 @@ export default function App() {
   const [isAiModalOpen, setIsAiModalOpen] = useState(false);
 
   const handleLaunchStudio = () => {
-    const el = document.querySelector('#features-showcase');
+    const el = document.querySelector('#features-explorer');
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }
@@ -32,8 +32,8 @@ export default function App() {
         {/* Section 1: Hero Section */}
         <Hero onLaunchStudio={handleLaunchStudio} />
 
-        {/* Section 2: Unified Interactive WebGL FlexCarousel Feature Showcase */}
-        <FeaturesShowcase />
+        {/* Section 2: Interactive Feature & Subfeature Matrix with LineSidebar */}
+        <FeatureExplorer />
       </main>
 
       {/* Footer */}

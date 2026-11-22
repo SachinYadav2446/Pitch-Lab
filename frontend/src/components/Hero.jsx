@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
+import TacticalFootballerArt from './TacticalFootballerArt';
 
 export default function Hero({ onLaunchStudio }) {
   const brandTarget = 'pitchvision.ai';
@@ -177,7 +178,7 @@ export default function Hero({ onLaunchStudio }) {
             }} />
           </div>
 
-          {/* Interior of Burgundy Slab: Clean and empty */}
+          {/* Interior of Burgundy Slab: Tactical CV Footballer Art */}
           <div style={{
             position: 'relative',
             zIndex: 6,
@@ -185,9 +186,10 @@ export default function Hero({ onLaunchStudio }) {
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            padding: '20px 10px'
           }}>
-            {/* Clean interior ready for next element */}
+            <TacticalFootballerArt />
           </div>
         </div>
       </div>

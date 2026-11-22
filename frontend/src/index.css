@@ -160,3 +160,23 @@ h1, h2, h3, h4, h5, .font-heading {
   animation: typewriterCursorBlink 0.9s infinite ease-in-out;
   border-radius: 2px;
 }
+
+/* Tactical Computer Vision Scanner Beam */
+@keyframes laserScanVertical {
+  0% {
+    transform: translateY(-150px);
+    opacity: 0.2;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translateY(270px);
+    opacity: 0.2;
+  }
+}
+
+.tactical-scanner-beam {
+  animation: laserScanVertical 4.5s ease-in-out infinite alternate;
+  transform-origin: center;
+}

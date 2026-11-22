@@ -3,11 +3,11 @@ import { ArrowRight, Menu } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const navLinks = [
-    { label: 'Novelties', href: '#vision-engine' },
-    { label: 'Architecture', href: '#architecture' },
-    { label: 'Observatory', href: '#homography' },
-    { label: 'Pipeline', href: '#pipeline' },
-    { label: 'Dataset', href: '#dataset' },
+    { label: 'Homography', href: '#homography' },
+    { label: 'Space Control', href: '#space-control' },
+    { label: 'Architecture', href: '#homography' },
+    { label: 'Pipeline', href: '#space-control' },
+    { label: 'Dataset', href: '#homography' },
   ];
 
   return (
@@ -59,6 +59,13 @@ export default function Navbar({ onLaunchStudio }) {
             <a
               key={link.label}
               href={link.href}
+              onClick={(e) => {
+                e.preventDefault();
+                const target = document.querySelector(link.href);
+                if (target) {
+                  target.scrollIntoView({ behavior: 'smooth' });
+                }
+              }}
               style={{
                 textDecoration: 'none',
                 color: 'var(--burgundy-deep)',

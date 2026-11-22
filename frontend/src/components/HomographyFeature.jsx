@@ -90,7 +90,7 @@ export default function HomographyFeature() {
               fontWeight: 500
             }}>
               Eliminates the need for in-stadium optical rigs or player GPS vests. Transform dynamic, moving
-              broadcast camera feeds into calibrated FIFA-standard 2D metric pitch coordinates ($105\text{m} \times 68\text{m}$) in real-time.
+              broadcast camera feeds into calibrated FIFA-standard 2D metric pitch coordinates (105m &times; 68m) in real-time.
             </p>
           </div>
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import LineSidebar from './LineSidebar';
-import { ArrowRight, Check, Activity, Sparkles } from 'lucide-react';
+import { ArrowRight, Check, Activity, ChevronRight } from 'lucide-react';
 
 const FEATURES_DATA = [
   {
@@ -11,7 +11,7 @@ const FEATURES_DATA = [
     image: '/features/feature_01_homography.jpg',
     specs: [
       { label: 'Latency', value: '1.8 ms' },
-      { label: 'Pitch Precision', value: '0.8 mm' },
+      { label: 'Precision', value: '0.8 mm' },
       { label: 'Algorithm', value: 'RANSAC + Epipolar' },
       { label: 'Throughput', value: '120 FPS' }
     ],
@@ -19,34 +19,37 @@ const FEATURES_DATA = [
       {
         id: 'h_warp',
         number: '01',
-        name: 'Projective Homography Warp',
-        description: 'Maps raw distorted camera angles to an exact 105m x 68m top-down coordinate plane with sub-pixel planar alignment.',
+        tabLabel: 'Projective Warp',
+        name: 'Projective Homography Warp H(3x3)',
+        description: 'Maps raw distorted broadcast angles to an exact 105m x 68m top-down coordinate plane with sub-pixel planar alignment.',
         bullets: [
           'Direct linear transform (DLT) with 4-point correspondence',
-          'Robust RANSAC outlier elimination for camera motion compensation',
-          'Hardware-accelerated bilinear texture warping on GPU'
+          'RANSAC outlier elimination for camera motion compensation',
+          'GPU-accelerated bilinear texture warping'
         ]
       },
       {
         id: 'h_epipolar',
         number: '02',
+        tabLabel: 'Epipolar Calibration',
         name: 'Epipolar Pitch Calibration',
-        description: 'Aligns multi-angle broadcast lenses against calibrated keypoint lines (touchlines, 18-yard box, center circle).',
+        description: 'Aligns broadcast lenses against calibrated pitch lines (touchlines, 18-yard box, center circle).',
         bullets: [
-          'Automated pitch landmark extraction (12 intersection points)',
-          'Lens distortion polynomial correction (radial & tangential)',
-          'Continuous frame-to-frame extrinsic camera parameter tracking'
+          'Automated landmark extraction across 12 pitch intersections',
+          'Radial & tangential lens distortion polynomial correction',
+          'Continuous frame-to-frame extrinsic parameter tracking'
         ]
       },
       {
         id: 'h_metric',
         number: '03',
-        name: 'Metric Coordinate Projection',
-        description: 'Translates pixel screen displacements directly into SI metric meters and velocities across the pitch plane.',
+        tabLabel: 'Metric Projection',
+        name: 'Metric Coordinate Projection (105m x 68m)',
+        description: 'Translates pixel displacements directly into SI metric meters and velocities across the pitch plane.',
         bullets: [
-          'Standardized FIFA 105m x 68m international dimension normalization',
+          'Standardized FIFA 105m x 68m dimension normalization',
           'Zero-elevation ground-plane restriction for player cleats',
-          'Z-coordinate vertical ray casting for aerial ball trajectories'
+          'Z-axis vertical ray casting for aerial ball trajectories'
         ]
       }
     ]
@@ -59,7 +62,7 @@ const FEATURES_DATA = [
     image: '/features/feature_02_voronoi.jpg',
     specs: [
       { label: 'Latency', value: '1.4 ms' },
-      { label: 'Grid Resolution', value: '105 x 68 m' },
+      { label: 'Resolution', value: '105 x 68 m' },
       { label: 'Algorithm', value: 'Delaunay + Voronoi' },
       { label: 'Throughput', value: '140 FPS' }
     ],
@@ -67,8 +70,9 @@ const FEATURES_DATA = [
       {
         id: 'v_partition',
         number: '01',
+        tabLabel: '22-Player Partitioning',
         name: '22-Player Voronoi Partitioning',
-        description: 'Dynamically computes continuous territorial dominance polygons bounded by pitch boundaries at 60 FPS.',
+        description: 'Computes continuous territorial dominance polygons bounded by pitch boundaries at 60 FPS.',
         bullets: [
           'Euclidean distance metric weighted by player sprint velocity vectors',
           'Convex hull boundary clipping at pitch touchlines and goal lines',
@@ -78,6 +82,7 @@ const FEATURES_DATA = [
       {
         id: 'v_dominance',
         number: '02',
+        tabLabel: 'Space Dominance',
         name: 'Space Dominance Ratio (m²)',
         description: 'Calculates the exact square meters controlled by Team Alpha vs Team Beta across all pitch thirds.',
         bullets: [
@@ -89,7 +94,8 @@ const FEATURES_DATA = [
       {
         id: 'v_passing',
         number: '03',
-        name: 'Passing Lane Occlusion',
+        tabLabel: 'Lane Occlusion',
+        name: 'Passing Lane Occlusion Calculus',
         description: 'Traces line-of-sight passing ray vectors to evaluate intercepted trajectory risks and open passing options.',
         bullets: [
           'Defensive shadow cone calculation for intercepting defenders',
@@ -107,36 +113,39 @@ const FEATURES_DATA = [
     image: '/features/feature_03_tracking.jpg',
     specs: [
       { label: 'Inference', value: '6.4 ms' },
-      { label: 'Active Tracks', value: '22 + 1 Objects' },
-      { label: 'Architecture', value: 'YOLOv8x + ByteTrack' },
+      { label: 'Tracks', value: '22 + 1 Objects' },
+      { label: 'Model', value: 'YOLOv8x + ByteTrack' },
       { label: 'Throughput', value: '64.9 FPS' }
     ],
     subfeatures: [
       {
         id: 't_yolo',
         number: '01',
+        tabLabel: 'Feature Detection',
         name: 'YOLOv8x Feature Detection',
         description: 'High-precision CNN backbone outputting bounding box coordinates, class labels, and confidence probabilities.',
         bullets: [
           'TensorRT FP16 optimized inference taking only 6.4ms on GPU',
           'Dual detection classes: Player (Human) and Football (Micro-object)',
-          'NMS IoU thresholding tuned to resolve congested goalmouth scrambles'
+          'NMS IoU thresholding tuned to resolve congested goalmouth duels'
         ]
       },
       {
         id: 't_kalman',
         number: '02',
+        tabLabel: 'Kalman Vectors',
         name: '8D Kalman Filter Vectors',
         description: 'Maintains state vectors [x, y, a, h, vx, vy, va, vh] to predict future positions through physical occlusions.',
         bullets: [
           'Linear motion model tracking velocity and aspect ratio evolution',
           'Smooth interpolation across missed detection frames',
-          'Measurement covariance update dynamically scaled by detection confidence'
+          'Measurement covariance update dynamically scaled by confidence'
         ]
       },
       {
         id: 't_bytetrack',
         number: '03',
+        tabLabel: 'ByteTrack Recovery',
         name: 'ByteTrack Low-Score Recovery',
         description: 'Recovers occluded or motion-blurred players using low-confidence secondary association stages.',
         bullets: [
@@ -156,14 +165,15 @@ const FEATURES_DATA = [
     specs: [
       { label: 'Latency', value: '1.5 ms' },
       { label: 'Color Space', value: '3D HSV' },
-      { label: 'Model', value: 'Adaptive K-Means' },
+      { label: 'Clustering', value: 'Adaptive K-Means' },
       { label: 'Throughput', value: '150 FPS' }
     ],
     subfeatures: [
       {
         id: 'c_hsv',
         number: '01',
-        name: '3D HSV Transformation',
+        tabLabel: '3D HSV Space',
+        name: '3D HSV Color Transformation',
         description: 'Converts RGB bounding box pixels into Hue, Saturation, and Value to isolate pigment invariant to shadows.',
         bullets: [
           'Decouples luminance from chromaticity for stadium shadow tolerance',
@@ -174,6 +184,7 @@ const FEATURES_DATA = [
       {
         id: 'c_grass',
         number: '02',
+        tabLabel: 'Grass Rejection',
         name: 'Pitch Grass Mask Rejection',
         description: 'Discards background grass pixels (Hue 35-85°) to isolate pure jersey fabric colors.',
         bullets: [
@@ -185,6 +196,7 @@ const FEATURES_DATA = [
       {
         id: 'c_kmeans',
         number: '03',
+        tabLabel: 'Team Centroids',
         name: 'K-Means Team Centroid Convergence',
         description: 'Partitions detected players into Team Alpha, Team Beta, Goalkeepers, and Match Officials.',
         bullets: [
@@ -211,6 +223,7 @@ const FEATURES_DATA = [
       {
         id: 'k_fifa',
         number: '01',
+        tabLabel: 'FIFA Sprint Zones',
         name: '5-Zone FIFA Sprint Calculus',
         description: 'Categorizes instantaneous player ground speeds into official FIFA physical performance tiers.',
         bullets: [
@@ -222,6 +235,7 @@ const FEATURES_DATA = [
       {
         id: 'k_decel',
         number: '02',
+        tabLabel: 'Deceleration Load',
         name: 'Deceleration G-Force & Joint Load',
         description: 'Measures negative acceleration peaks (up to -7.5 m/s²) to identify metabolic fatigue and hamstring strain risk.',
         bullets: [
@@ -233,6 +247,7 @@ const FEATURES_DATA = [
       {
         id: 'k_leaderboard',
         number: '03',
+        tabLabel: 'Sprint Leaderboard',
         name: 'Real-Time Physical Leaderboard',
         description: 'Surfaces live top sprint speeds, total distance covered, and high-intensity sprint bursts across all 22 players.',
         bullets: [
@@ -251,15 +266,16 @@ const FEATURES_DATA = [
     image: '/features/feature_06_biomechanics.jpg',
     specs: [
       { label: 'Latency', value: '8.2 ms' },
-      { label: 'Skeletal Joints', value: '17 3D Nodes' },
-      { label: 'Architecture', value: 'ViTPose-H + Lift' },
+      { label: 'Joints', value: '17 3D Nodes' },
+      { label: 'Model', value: 'ViTPose-H + Lift' },
       { label: 'Sampling', value: '240 Hz' }
     ],
     subfeatures: [
       {
         id: 'b_vitpose',
         number: '01',
-        name: 'ViTPose-H 17 Keypoints',
+        tabLabel: '17 Keypoints',
+        name: 'ViTPose-H 17 Keypoint Extraction',
         description: 'Vision Transformer backbone (632M params) extracting 17 3D anatomical skeletal landmarks.',
         bullets: [
           'Tracks head, shoulders, elbows, wrists, spine, pelvis, knees, and cleats',
@@ -270,6 +286,7 @@ const FEATURES_DATA = [
       {
         id: 'b_twist',
         number: '02',
+        tabLabel: 'Rotational Coil',
         name: 'Torso-Pelvis Rotational Coil',
         description: 'Quantifies the elastic coil angle between the shoulder girdle and pelvic plane for maximum ball strike power.',
         bullets: [
@@ -281,6 +298,7 @@ const FEATURES_DATA = [
       {
         id: 'b_whip',
         number: '03',
+        tabLabel: 'Cleat Strike',
         name: 'Segmental Knee Whip & Foot Strike',
         description: 'Calculates striking cleat linear velocity (106.8 km/h), knee flexion angle, and 9.8ms ball contact duration.',
         bullets: [
@@ -300,13 +318,14 @@ const FEATURES_DATA = [
     specs: [
       { label: 'Latency', value: '14.8 ms' },
       { label: 'Sync', value: 'Frame-Accurate' },
-      { label: 'Modes', value: 'Broadcast + Radar' },
+      { label: 'Feed', value: 'Dual HUD + Radar' },
       { label: 'Throughput', value: '64.9 FPS' }
     ],
     subfeatures: [
       {
         id: 'vs_hud',
         number: '01',
+        tabLabel: 'Broadcast HUD',
         name: 'Broadcast Telemetry HUD',
         description: 'Overlays bounding boxes, player tags, velocity vectors, and foot ground rings directly on video feed.',
         bullets: [
@@ -318,6 +337,7 @@ const FEATURES_DATA = [
       {
         id: 'vs_radar',
         number: '02',
+        tabLabel: '2D Pitch Radar',
         name: 'Live 2D Planar Pitch Radar',
         description: 'Birds-eye view of the 105m x 68m pitch displaying moving player dots and ball in exact synchronization.',
         bullets: [
@@ -329,6 +349,7 @@ const FEATURES_DATA = [
       {
         id: 'vs_offside',
         number: '03',
+        tabLabel: 'Offside Line',
         name: 'Dynamic Calibrated Offside Line',
         description: 'Continuously projects planar offside line through the second-last defender parallel to the goal line.',
         bullets: [
@@ -348,13 +369,14 @@ const FEATURES_DATA = [
     specs: [
       { label: 'Total Latency', value: '14.8 ms' },
       { label: 'Throughput', value: '64.9 FPS' },
-      { label: 'Inference Engine', value: 'NVIDIA TensorRT' },
+      { label: 'Engine', value: 'NVIDIA TensorRT' },
       { label: 'Streaming', value: 'WebRTC / Zero-Copy' }
     ],
     subfeatures: [
       {
         id: 'p_ingest',
         number: '01',
+        tabLabel: 'NVDEC Ingest',
         name: 'NVDEC Hardware Ingestion',
         description: 'Hardware NVDEC video decoding and FP16 kernel optimization for sub-millisecond tensor processing.',
         bullets: [
@@ -366,7 +388,8 @@ const FEATURES_DATA = [
       {
         id: 'p_sync',
         number: '02',
-        name: 'Zero-Copy Interconnect',
+        tabLabel: 'Zero-Copy Interconnect',
+        name: 'Zero-Copy Shared Memory Interconnect',
         description: 'Transfers inference tensors between tracking, homography, and clustering without CPU bottlenecks.',
         bullets: [
           'Zero IPC overhead via shared POSIX memory buffers',
@@ -377,6 +400,7 @@ const FEATURES_DATA = [
       {
         id: 'p_egress',
         number: '03',
+        tabLabel: 'Low-Latency Egress',
         name: 'Sub-20ms Low-Latency Egress',
         description: 'Streams live video frames with synchronized JSON telemetry packets to tactical dashboards worldwide.',
         bullets: [
@@ -407,125 +431,75 @@ export default function FeatureExplorer() {
       position: 'relative',
       width: '100%',
       backgroundColor: 'var(--bg-sage)',
-      padding: '90px 48px 130px',
+      padding: '54px 48px 74px',
       boxSizing: 'border-box'
     }}>
       <div style={{ maxWidth: '1440px', margin: '0 auto' }}>
         
         {/* ========================================================
-            TOP HEADER: CLEAN, FLOATING, EDITORIAL
+            TOP HEADER: COMPACT, EDITORIAL
             ======================================================== */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          marginBottom: '54px',
+          alignItems: 'baseline',
+          marginBottom: '28px',
           flexWrap: 'wrap',
-          gap: '24px'
+          gap: '16px'
         }}>
           <div>
-            <div style={{
-              fontSize: '0.72rem',
-              fontWeight: 800,
-              color: 'var(--burgundy-deep)',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              marginBottom: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
-              <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--burgundy-deep)' }} />
-              SYSTEM MATRIX // 08 DEEP LEARNING MODULES
-            </div>
-
-            <h2 style={{
-              fontSize: 'clamp(2.4rem, 4vw, 3.4rem)',
-              fontWeight: 900,
-              color: 'var(--burgundy-deep)',
-              letterSpacing: '-0.03em',
-              lineHeight: 1.05,
-              margin: '0 0 12px 0'
-            }}>
-              Tactical Vision Architecture
-            </h2>
-
-            <p style={{
-              color: '#380504',
-              fontSize: '1.05rem',
-              maxWidth: '820px',
-              margin: 0,
-              opacity: 0.88,
-              lineHeight: 1.55
-            }}>
-              Hover and select any vision system on the floating line sidebar to explore its deep learning architecture,
-              epipolar mathematics, and granular subfeature telemetry.
-            </p>
-          </div>
-
-          {/* Minimal Floating Metrics */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '28px'
-          }}>
-            <div>
-              <div style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--burgundy-deep)', opacity: 0.65, letterSpacing: '0.06em' }}>
-                ARCHITECTURE
-              </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--burgundy-deep)', fontFamily: 'monospace' }}>
-                8 Systems
-              </div>
-            </div>
-
-            <div style={{ width: '1px', height: '36px', backgroundColor: 'rgba(89, 9, 7, 0.2)' }} />
-
-            <div>
-              <div style={{ fontSize: '0.68rem', fontWeight: 800, color: 'var(--burgundy-deep)', opacity: 0.65, letterSpacing: '0.06em' }}>
-                THROUGHPUT
-              </div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#1B4965', fontFamily: 'monospace' }}>
-                64.9 FPS
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* ========================================================
-            MAIN FLOATING STAGE:
-            LEFT: LineSidebar (Floating freely directly on canvas)
-            RIGHT: Feature Showcase & Subfeatures (Floating, No nested box)
-            ======================================================== */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(340px, 420px) minmax(0, 1fr)',
-          gap: '56px',
-          alignItems: 'start'
-        }}>
-          
-          {/* ========================================================
-              LEFT COLUMN: LineSidebar FLOATING FREELY ON SAGE CANVAS
-              - No enclosing card box
-              - No border, no background, no box shadow
-              ======================================================== */}
-          <div style={{
-            position: 'sticky',
-            top: '48px',
-            paddingTop: '6px'
-          }}>
             <div style={{
               fontSize: '0.68rem',
               fontWeight: 800,
               color: 'var(--burgundy-deep)',
               letterSpacing: '0.12em',
               textTransform: 'uppercase',
-              marginBottom: '20px',
-              paddingLeft: '60px',
-              opacity: 0.6
+              marginBottom: '4px',
+              opacity: 0.75
             }}>
-              SELECT SYSTEM
+              SYSTEM MATRIX // 08 DEEP LEARNING MODULES
             </div>
 
+            <h2 style={{
+              fontSize: 'clamp(1.8rem, 2.6vw, 2.4rem)',
+              fontWeight: 900,
+              color: 'var(--burgundy-deep)',
+              letterSpacing: '-0.025em',
+              margin: 0,
+              lineHeight: 1.1
+            }}>
+              Tactical Vision Architecture
+            </h2>
+          </div>
+
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '16px',
+            fontSize: '0.74rem',
+            color: 'var(--burgundy-deep)',
+            fontWeight: 800
+          }}>
+            <span>8 Production Systems</span>
+            <span style={{ opacity: 0.35 }}>|</span>
+            <span style={{ color: '#1B4965' }}>64.9 FPS Ingestion</span>
+          </div>
+        </div>
+
+        {/* ========================================================
+            MAIN LAYOUT:
+            LEFT: LineSidebar
+            RIGHT: Clean, Compact, Professional Stage
+            ======================================================== */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'minmax(320px, 380px) minmax(0, 1fr)',
+          gap: '36px',
+          alignItems: 'start'
+        }}>
+          
+          {/* LEFT: LineSidebar (Floating freely) */}
+          <div style={{ position: 'sticky', top: '32px' }}>
             <LineSidebar
               items={sidebarItems}
               accentColor="#590907"
@@ -533,15 +507,15 @@ export default function FeatureExplorer() {
               markerColor="rgba(89, 9, 7, 0.35)"
               showIndex={true}
               showMarker={true}
-              proximityRadius={95}
-              maxShift={26}
+              proximityRadius={85}
+              maxShift={22}
               falloff="smooth"
-              markerLength={48}
+              markerLength={44}
               markerGap={0}
               tickScale={0.5}
               scaleTick={true}
-              itemGap={22}
-              fontSize={1.04}
+              itemGap={15}
+              fontSize={0.96}
               smoothing={90}
               defaultActive={0}
               onItemClick={(idx) => handleFeatureSelect(idx)}
@@ -549,139 +523,134 @@ export default function FeatureExplorer() {
           </div>
 
           {/* ========================================================
-              RIGHT COLUMN: ACTIVE FEATURE & SUBFEATURES STAGE
-              - Floating effortlessly directly on the canvas
-              - No heavy card boxes, no nested container rectangles
+              RIGHT: CLEAN, PROFESSIONAL, TIGHTENED STAGE
+              - No heavy card boxes
+              - High-contrast, legible subfeature tabs
+              - Compact visual artwork next to crisp technical points
               ======================================================== */}
           <div style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '32px'
+            gap: '14px',
+            paddingLeft: '6px'
           }}>
             
-            {/* 1. Feature Title, Tag & Specs (Floating Open Layout) */}
+            {/* 1. Feature Title, Tag & Compact Specs */}
             <div>
               <div style={{
-                fontSize: '0.74rem',
+                fontSize: '0.68rem',
                 fontWeight: 800,
                 color: 'var(--burgundy-deep)',
-                letterSpacing: '0.1em',
-                marginBottom: '8px',
+                letterSpacing: '0.08em',
+                marginBottom: '4px',
                 opacity: 0.75
               }}>
                 {currentFeature.tag}
               </div>
 
               <h3 style={{
-                margin: '0 0 10px 0',
-                fontSize: 'clamp(2rem, 2.8vw, 2.6rem)',
+                margin: '0 0 6px 0',
+                fontSize: '1.75rem',
                 fontWeight: 900,
                 color: 'var(--burgundy-deep)',
                 letterSpacing: '-0.02em',
-                lineHeight: 1.1
+                lineHeight: 1.15
               }}>
                 {currentFeature.title}
               </h3>
 
               <p style={{
-                margin: '0 0 20px 0',
-                fontSize: '1.05rem',
+                margin: '0 0 10px 0',
+                fontSize: '0.88rem',
                 color: '#380504',
-                lineHeight: 1.55,
-                opacity: 0.9,
-                maxWidth: '780px'
+                lineHeight: 1.45,
+                opacity: 0.88
               }}>
                 {currentFeature.tagline}
               </p>
 
-              {/* Minimalist Floating Specs Strip */}
+              {/* Compact Inline Tech Chips */}
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
-                gap: '20px',
-                flexWrap: 'wrap',
-                paddingTop: '14px',
-                borderTop: '1px solid rgba(89, 9, 7, 0.15)'
+                gap: '8px',
+                flexWrap: 'wrap'
               }}>
                 {currentFeature.specs.map((s, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'baseline', gap: '6px' }}>
-                    <span style={{ fontSize: '0.72rem', fontWeight: 700, color: '#380504', opacity: 0.65 }}>
-                      {s.label}:
-                    </span>
-                    <span style={{ fontSize: '0.88rem', fontWeight: 900, color: 'var(--burgundy-deep)', fontFamily: 'monospace' }}>
-                      {s.value}
-                    </span>
+                  <div
+                    key={idx}
+                    style={{
+                      backgroundColor: 'rgba(89, 9, 7, 0.08)',
+                      border: '1px solid rgba(89, 9, 7, 0.15)',
+                      borderRadius: '2px',
+                      padding: '2px 8px',
+                      fontSize: '0.70rem',
+                      fontFamily: 'monospace',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '4px'
+                    }}
+                  >
+                    <span style={{ color: '#5C473B', opacity: 0.8 }}>{s.label}:</span>
+                    <strong style={{ color: 'var(--burgundy-deep)', fontWeight: 800 }}>{s.value}</strong>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* 2. Floating Subfeatures Switcher (Minimalist Underlined Pills) */}
-            <div>
-              <div style={{
-                fontSize: '0.68rem',
-                fontWeight: 800,
-                color: 'var(--burgundy-deep)',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                marginBottom: '12px',
-                opacity: 0.65
-              }}>
-                GRANULAR SUBFEATURES
-              </div>
-
-              <div style={{
-                display: 'flex',
-                gap: '12px',
-                flexWrap: 'wrap'
-              }}>
-                {currentFeature.subfeatures.map((sub, idx) => {
-                  const isActive = activeSubfeatureIndex === idx;
-                  return (
-                    <button
-                      key={sub.id}
-                      onClick={() => setActiveSubfeatureIndex(idx)}
-                      style={{
-                        backgroundColor: isActive ? 'var(--burgundy-deep)' : 'transparent',
-                        color: isActive ? 'var(--cream-bg)' : 'var(--burgundy-deep)',
-                        border: `1.5px solid ${isActive ? 'var(--burgundy-deep)' : 'rgba(89, 9, 7, 0.25)'}`,
-                        borderRadius: '2px',
-                        padding: '8px 16px',
-                        fontSize: '0.78rem',
-                        fontWeight: 800,
-                        cursor: 'pointer',
-                        transition: 'all 0.15s ease',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '8px'
-                      }}
-                    >
-                      <span style={{ opacity: isActive ? 0.7 : 0.5, fontFamily: 'monospace' }}>
-                        {sub.number}
-                      </span>
-                      <span>{sub.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
+            {/* 2. Subfeatures Switcher (Clean, High-Contrast Segmented Tabs) */}
+            <div style={{
+              display: 'flex',
+              gap: '6px',
+              flexWrap: 'wrap',
+              paddingTop: '6px'
+            }}>
+              {currentFeature.subfeatures.map((sub, idx) => {
+                const isActive = activeSubfeatureIndex === idx;
+                return (
+                  <button
+                    key={sub.id}
+                    onClick={() => setActiveSubfeatureIndex(idx)}
+                    style={{
+                      backgroundColor: isActive ? 'var(--burgundy-deep)' : 'transparent',
+                      color: isActive ? '#FFFFFF' : 'var(--burgundy-deep)',
+                      border: `1.5px solid ${isActive ? 'var(--burgundy-deep)' : 'rgba(89, 9, 7, 0.3)'}`,
+                      borderRadius: '2px',
+                      padding: '5px 12px',
+                      fontSize: '0.74rem',
+                      fontWeight: 800,
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <span style={{ opacity: isActive ? 0.75 : 0.55, fontFamily: 'monospace', fontSize: '0.68rem' }}>
+                      {sub.number}
+                    </span>
+                    <span>{sub.tabLabel || sub.name}</span>
+                  </button>
+                );
+              })}
             </div>
 
-            {/* 3. Subfeature Details: Floating Visual Preview (Left) + Algorithmic Capabilities (Right) */}
+            {/* 3. Side-by-Side: Compact Visual Preview (Left) + Technical Points (Right) */}
             <div style={{
               display: 'grid',
-              gridTemplateColumns: 'minmax(280px, 360px) minmax(0, 1fr)',
-              gap: '36px',
+              gridTemplateColumns: '260px minmax(0, 1fr)',
+              gap: '24px',
               alignItems: 'start',
               paddingTop: '10px'
             }}>
               
-              {/* Floating High-Res Visual Artwork */}
+              {/* Compact Visual Preview (16:10 ratio, clean and tight) */}
               <div style={{
                 position: 'relative',
                 borderRadius: '2px',
                 overflow: 'hidden',
-                boxShadow: '0 20px 48px rgba(89, 9, 7, 0.16)',
-                border: '1px solid rgba(89, 9, 7, 0.2)',
+                boxShadow: '0 8px 24px rgba(89, 9, 7, 0.12)',
+                border: '1px solid rgba(89, 9, 7, 0.25)',
                 backgroundColor: '#162019'
               }}>
                 <img
@@ -690,45 +659,42 @@ export default function FeatureExplorer() {
                   style={{
                     width: '100%',
                     height: 'auto',
-                    aspectRatio: '4/5',
+                    aspectRatio: '16/11',
                     objectFit: 'cover',
                     display: 'block'
                   }}
                 />
 
-                {/* Subtle Neural Overlay Bar */}
+                {/* Minimalist Overlay Footnote */}
                 <div style={{
                   position: 'absolute',
                   bottom: 0,
                   left: 0,
                   right: 0,
                   backgroundColor: 'rgba(7, 9, 89, 0.90)',
-                  backdropFilter: 'blur(6px)',
-                  padding: '8px 14px',
+                  padding: '5px 10px',
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  borderTop: '1px solid rgba(181, 210, 232, 0.25)'
+                  fontSize: '0.62rem',
+                  color: '#FFF6EB',
+                  fontWeight: 800
                 }}>
-                  <span style={{ fontSize: '0.68rem', color: '#FFF6EB', fontWeight: 800 }}>
-                    NEURAL TELEMETRY
-                  </span>
-                  <span style={{ fontSize: '0.65rem', color: '#E8D2B5', fontFamily: 'monospace', fontWeight: 800 }}>
-                    60 FPS LOCK
-                  </span>
+                  <span>NEURAL TELEMETRY</span>
+                  <span style={{ color: '#E8D2B5', fontFamily: 'monospace' }}>60 FPS</span>
                 </div>
               </div>
 
-              {/* Subfeature Algorithmic Breakdown (Clean Floating Typography) */}
+              {/* Subfeature Algorithmic Breakdown */}
               <div style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '22px'
+                gap: '10px'
               }}>
                 <div>
                   <h4 style={{
-                    margin: '0 0 10px 0',
-                    fontSize: '1.45rem',
+                    margin: '0 0 4px 0',
+                    fontSize: '1.08rem',
                     fontWeight: 900,
                     color: 'var(--burgundy-deep)',
                     letterSpacing: '-0.01em'
@@ -737,114 +703,84 @@ export default function FeatureExplorer() {
                   </h4>
                   <p style={{
                     margin: 0,
-                    fontSize: '0.98rem',
+                    fontSize: '0.84rem',
                     color: '#380504',
-                    lineHeight: 1.6,
-                    opacity: 0.9
+                    lineHeight: 1.45,
+                    opacity: 0.88
                   }}>
                     {currentSubfeature.description}
                   </p>
                 </div>
 
-                {/* Algorithmic Capabilities List (Floating with subtle tick marks) */}
+                {/* Tight Bullets */}
                 <div style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '12px',
-                  paddingTop: '8px'
+                  gap: '6px'
                 }}>
-                  <div style={{
-                    fontSize: '0.70rem',
-                    fontWeight: 800,
-                    color: 'var(--burgundy-deep)',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    opacity: 0.7
-                  }}>
-                    CORE CAPABILITIES
-                  </div>
-
                   {currentSubfeature.bullets.map((bullet, bIdx) => (
                     <div
                       key={bIdx}
                       style={{
                         display: 'flex',
-                        alignItems: 'flex-start',
-                        gap: '12px'
-                      }}
-                    >
-                      <span style={{
-                        color: 'var(--burgundy-deep)',
-                        fontWeight: 900,
-                        fontSize: '1rem',
-                        lineHeight: 1.3
-                      }}>
-                        &mdash;
-                      </span>
-                      <span style={{
-                        fontSize: '0.92rem',
+                        alignItems: 'baseline',
+                        gap: '8px',
+                        fontSize: '0.80rem',
                         color: '#281D17',
                         fontWeight: 600,
-                        lineHeight: 1.5
-                      }}>
-                        {bullet}
-                      </span>
+                        lineHeight: 1.4
+                      }}
+                    >
+                      <span style={{ color: 'var(--burgundy-deep)', fontWeight: 900 }}>&bull;</span>
+                      <span>{bullet}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Next Step Action Button */}
                 <div style={{
-                  paddingTop: '16px',
-                  marginTop: '10px',
-                  borderTop: '1px solid rgba(89, 9, 7, 0.15)',
+                  paddingTop: '8px',
                   display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  gap: '12px'
                 }}>
-                  <span style={{ fontSize: '0.74rem', color: '#555', fontWeight: 700 }}>
-                    Subfeature {activeSubfeatureIndex + 1} of {currentFeature.subfeatures.length}
-                  </span>
-
                   {activeSubfeatureIndex < currentFeature.subfeatures.length - 1 ? (
                     <button
                       onClick={() => setActiveSubfeatureIndex(prev => prev + 1)}
                       style={{
-                        backgroundColor: 'var(--burgundy-deep)',
-                        color: 'var(--cream-bg)',
+                        backgroundColor: 'transparent',
+                        color: 'var(--burgundy-deep)',
                         border: 'none',
-                        borderRadius: '2px',
-                        padding: '8px 16px',
-                        fontSize: '0.76rem',
+                        padding: 0,
+                        fontSize: '0.74rem',
                         fontWeight: 800,
                         cursor: 'pointer',
-                        display: 'flex',
+                        display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '4px'
                       }}
                     >
-                      <span>Next Subfeature</span>
-                      <ArrowRight size={13} />
+                      <span>Next Subfeature ({currentFeature.subfeatures[activeSubfeatureIndex + 1].tabLabel})</span>
+                      <ArrowRight size={12} />
                     </button>
                   ) : (
                     <button
                       onClick={() => handleFeatureSelect((activeFeatureIndex + 1) % FEATURES_DATA.length)}
                       style={{
-                        backgroundColor: 'var(--burgundy-deep)',
-                        color: 'var(--cream-bg)',
+                        backgroundColor: 'transparent',
+                        color: 'var(--burgundy-deep)',
                         border: 'none',
-                        borderRadius: '2px',
-                        padding: '8px 16px',
-                        fontSize: '0.76rem',
+                        padding: 0,
+                        fontSize: '0.74rem',
                         fontWeight: 800,
                         cursor: 'pointer',
-                        display: 'flex',
+                        display: 'inline-flex',
                         alignItems: 'center',
-                        gap: '6px'
+                        gap: '4px'
                       }}
                     >
-                      <span>Next System</span>
-                      <ArrowRight size={13} />
+                      <span>Next System ({FEATURES_DATA[(activeFeatureIndex + 1) % FEATURES_DATA.length].title})</span>
+                      <ArrowRight size={12} />
                     </button>
                   )}
                 </div>

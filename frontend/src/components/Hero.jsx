@@ -191,7 +191,7 @@ export default function Hero({ onLaunchStudio }) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              padding: '60px 24px',
+              padding: '30px 20px',
               zIndex: 2
             }}>
               <TacticalFootballerArt />

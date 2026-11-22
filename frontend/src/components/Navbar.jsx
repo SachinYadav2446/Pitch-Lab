@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Activity, Bell, ArrowUpRight, Menu, X } from 'lucide-react';
 
 export default function Navbar({ onLaunchStudio }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
-    { label: 'Vision Engine', href: '#vision-engine' },
-    { label: 'Pitch Radar', href: '#homography' },
-    { label: 'Tactical Metrics', href: '#metrics' },
+    { label: 'Novelties', href: '#vision-engine' },
     { label: 'Architecture', href: '#architecture' },
+    { label: 'Observatory', href: '#homography' },
+    { label: 'Pipeline', href: '#pipeline' },
+    { label: 'Dataset', href: '#dataset' },
   ];
 
   return (
@@ -16,24 +17,42 @@ export default function Navbar({ onLaunchStudio }) {
       position: 'sticky',
       top: 0,
       zIndex: 1000,
-      padding: '20px 48px',
+      padding: '16px 44px',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'space-between',
-      border: 'none',
-      borderBottom: 'none',
-      boxShadow: 'none',
-      transition: 'all 0.3s ease'
+      borderBottom: '1px solid rgba(255, 240, 220, 0.06)'
     }}>
-      {/* Left spacer for perfect centering balance */}
-      <div style={{ flex: 1 }} className="hidden-mobile" />
+      {/* Left Brand Identity: VortexAI style */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <a href="#" style={{
+          textDecoration: 'none',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px'
+        }}>
+          <span style={{
+            fontFamily: 'Space Grotesk, sans-serif',
+            fontSize: '1.35rem',
+            fontWeight: 800,
+            letterSpacing: '-0.02em',
+            color: 'var(--cream-primary)'
+          }}>
+            pitch<span style={{ color: '#E03542' }}>LAB</span>
+          </span>
+        </a>
+      </div>
 
-      {/* Clean Centered Navigation Links */}
+      {/* Center Nav Links Pill (VortexAI style) */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
-        gap: '42px',
-        justifyContent: 'center'
+        gap: '24px',
+        background: 'rgba(255, 240, 220, 0.04)',
+        border: '1px solid rgba(255, 240, 220, 0.1)',
+        padding: '8px 24px',
+        borderRadius: '30px',
+        backdropFilter: 'blur(10px)'
       }} className="hidden-mobile">
         {navLinks.map((link) => (
           <a
@@ -42,20 +61,17 @@ export default function Navbar({ onLaunchStudio }) {
             style={{
               textDecoration: 'none',
               color: 'var(--cream-secondary)',
-              fontSize: '0.94rem',
+              fontSize: '0.85rem',
               fontWeight: 600,
-              letterSpacing: '0.3px',
-              opacity: 0.85,
+              letterSpacing: '0.2px',
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
               e.target.style.color = '#FFFFFF';
-              e.target.style.opacity = '1';
-              e.target.style.textShadow = '0 0 12px rgba(255,240,220,0.6)';
+              e.target.style.textShadow = '0 0 10px rgba(224, 53, 66, 0.6)';
             }}
             onMouseLeave={(e) => {
               e.target.style.color = 'var(--cream-secondary)';
-              e.target.style.opacity = '0.85';
               e.target.style.textShadow = 'none';
             }}
           >
@@ -64,26 +80,34 @@ export default function Navbar({ onLaunchStudio }) {
         ))}
       </div>
 
-      {/* Right Side Action CTA (Clean pill, no borders, no RTX text) */}
-      <div style={{
-        flex: 1,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        gap: '16px'
-      }}>
+      {/* Right Action: Glowing Coral/Crimson Button + Notification Bell */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <button
           onClick={onLaunchStudio}
-          className="btn-cream-primary"
-          style={{
-            border: 'none',
-            borderRadius: '30px',
-            padding: '10px 24px',
-            fontSize: '0.88rem'
-          }}
+          className="btn-vortex-primary"
+          style={{ padding: '8px 20px', fontSize: '0.85rem' }}
         >
-          <span>Launch Studio</span>
-          <ArrowUpRight size={16} />
+          <Activity size={14} />
+          <span>Tactical Console</span>
+        </button>
+
+        <button
+          style={{
+            width: '38px',
+            height: '38px',
+            borderRadius: '50%',
+            background: 'rgba(255, 240, 220, 0.05)',
+            border: '1px solid rgba(255, 240, 220, 0.15)',
+            color: 'var(--cream-secondary)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+          aria-label="Notifications"
+        >
+          <Bell size={15} />
         </button>
 
         {/* Mobile Menu Button */}
@@ -100,58 +124,9 @@ export default function Navbar({ onLaunchStudio }) {
           className="show-mobile"
           aria-label="Toggle Navigation Menu"
         >
-          {mobileMenuOpen ? <X size={26} /> : <Menu size={26} />}
+          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
-
-      {/* Mobile Menu Drawer */}
-      {mobileMenuOpen && (
-        <div style={{
-          position: 'absolute',
-          top: '100%',
-          left: 0,
-          right: 0,
-          background: 'rgba(52, 4, 7, 0.98)',
-          backdropFilter: 'blur(20px)',
-          padding: '24px',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '20px'
-        }}>
-          {navLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                textDecoration: 'none',
-                color: 'var(--cream-primary)',
-                fontSize: '1.1rem',
-                fontWeight: 600
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
-          <button
-            onClick={() => {
-              setMobileMenuOpen(false);
-              onLaunchStudio();
-            }}
-            className="btn-cream-primary"
-            style={{
-              border: 'none',
-              borderRadius: '30px',
-              padding: '12px 24px',
-              fontSize: '0.95rem',
-              justifyContent: 'center'
-            }}
-          >
-            <span>Launch Studio</span>
-            <ArrowUpRight size={16} />
-          </button>
-        </div>
-      )}
     </nav>
   );
 }

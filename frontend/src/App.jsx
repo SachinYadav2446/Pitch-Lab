@@ -12,8 +12,8 @@ export default function App() {
       minHeight: '100vh',
       display: 'flex',
       flexDirection: 'column',
-      backgroundColor: 'var(--bg-burgundy-root)',
-      color: 'var(--text-primary)'
+      backgroundColor: 'var(--bg-sage)',
+      color: 'var(--text-burgundy)'
     }}>
       {/* Section 1: Header Navigation */}
       <Navbar onLaunchStudio={handleLaunchStudio} />

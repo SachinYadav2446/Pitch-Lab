@@ -69,58 +69,58 @@ export default function Hero({ onLaunchStudio }) {
           display: 'flex',
           flexDirection: 'column'
         }}>
-          {/* Main Headline (Warm Ivory Cream on Deep Burgundy) */}
+          {/* Main Headline (Deep Burgundy #590907 on Muted Sage Grey #A5A79B) */}
           <h1 style={{
             fontSize: 'clamp(2.5rem, 4.2vw, 4.1rem)',
             fontWeight: 800,
             lineHeight: 1.08,
             letterSpacing: '-0.035em',
-            color: 'var(--cream-primary)',
+            color: 'var(--burgundy-deep)',
             marginBottom: '26px'
           }}>
             Autonomous Sub-Pixel<br />
             <span style={{
-              color: 'var(--cream-primary)',
+              color: 'var(--burgundy-deep)',
               textDecoration: 'underline',
               textUnderlineOffset: '10px',
               textDecorationThickness: '3.5px',
-              textDecorationColor: 'rgba(255, 240, 220, 0.65)'
+              textDecorationColor: 'var(--burgundy-deep)'
             }}>
               Player Tracking
             </span> & Deep<br />
             Homography.
           </h1>
 
-          {/* Middle Row: Preview Card + Description */}
+          {/* Middle Row: Preview Card in Warm Cream Beige + Description */}
           <div style={{
             display: 'flex',
             alignItems: 'center',
             gap: '18px',
             marginBottom: '32px'
           }}>
-            {/* Mini Radar / Preview Thumbnail Box in Deep Burgundy & Ivory Cream */}
+            {/* Mini Radar / Preview Thumbnail Box in Warm Cream Beige #E8D2B5 */}
             <div style={{
               width: '82px',
               height: '82px',
               minWidth: '82px',
               borderRadius: '14px',
-              background: 'linear-gradient(135deg, rgba(121, 11, 19, 0.45) 0%, rgba(52, 4, 7, 0.95) 100%)',
-              border: '1px solid var(--cream-border)',
+              background: 'var(--cream-beige)',
+              border: '1.5px solid rgba(89, 9, 7, 0.25)',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
               position: 'relative',
               overflow: 'hidden',
-              boxShadow: '0 4px 18px rgba(0, 0, 0, 0.5)'
+              boxShadow: '0 4px 16px rgba(89, 9, 7, 0.15)'
             }}>
-              {/* Pitch Radar rings */}
+              {/* Pitch Radar rings in Deep Burgundy */}
               <div style={{
                 position: 'absolute',
                 width: '60px',
                 height: '60px',
                 borderRadius: '50%',
-                border: '1px dashed rgba(255, 240, 220, 0.3)',
+                border: '1px dashed rgba(89, 9, 7, 0.35)',
                 animation: 'spin 20s linear infinite'
               }} />
               <div style={{
@@ -128,21 +128,21 @@ export default function Hero({ onLaunchStudio }) {
                 width: '32px',
                 height: '32px',
                 borderRadius: '50%',
-                border: '1.5px solid rgba(255, 240, 220, 0.5)'
+                border: '1.5px solid var(--burgundy-deep)'
               }} />
               <div style={{
                 width: '6px',
                 height: '6px',
                 borderRadius: '50%',
-                backgroundColor: '#FFF0DC',
-                boxShadow: '0 0 8px #FFF0DC'
+                backgroundColor: 'var(--burgundy-deep)',
+                boxShadow: '0 0 8px rgba(89, 9, 7, 0.5)'
               }} />
               <span style={{
                 position: 'absolute',
                 bottom: '4px',
                 fontSize: '0.62rem',
                 fontWeight: 800,
-                color: 'var(--cream-primary)',
+                color: 'var(--burgundy-deep)',
                 letterSpacing: '0.4px'
               }}>
                 60 FPS Fix
@@ -153,8 +153,8 @@ export default function Hero({ onLaunchStudio }) {
             <p style={{
               fontSize: '0.94rem',
               lineHeight: 1.6,
-              color: 'var(--cream-secondary)',
-              fontWeight: 450
+              color: 'var(--text-burgundy-muted)',
+              fontWeight: 500
             }}>
               Unified multi-camera deep learning pipeline for professional football: continuous sub-pixel player tracking coupled with physical velocity regression in &lt;16 ms.
             </p>
@@ -169,18 +169,18 @@ export default function Hero({ onLaunchStudio }) {
           }}>
             <button
               onClick={togglePlay}
-              className="btn-burgundy-secondary"
+              className="btn-cream-secondary"
             >
-              <Zap size={15} color="#FFF0DC" />
+              <Zap size={15} color="#590907" />
               <span>Interactive Demo</span>
             </button>
 
             <button
               onClick={onLaunchStudio}
-              className="btn-cream-primary"
+              className="btn-burgundy-primary"
             >
               <span>Tactical Console</span>
-              <ArrowRight size={15} color="#340407" />
+              <ArrowRight size={15} color="var(--cream-beige)" />
             </button>
           </div>
         </div>
@@ -194,7 +194,7 @@ export default function Hero({ onLaunchStudio }) {
           zIndex: 5,
           pointerEvents: 'none'
         }}>
-          {/* Glowing Contour Line in Warm Ivory & Burgundy */}
+          {/* Glowing Contour Line in Deep Burgundy #590907 */}
           <svg
             style={{
               position: 'absolute',
@@ -225,10 +225,10 @@ export default function Hero({ onLaunchStudio }) {
                 Z
               "
               fill="none"
-              stroke="rgba(255, 240, 220, 0.4)"
-              strokeWidth="0.5"
+              stroke="#590907"
+              strokeWidth="0.6"
               vectorEffect="non-scaling-stroke"
-              style={{ filter: 'drop-shadow(0 0 8px rgba(255, 240, 220, 0.2))' }}
+              style={{ filter: 'drop-shadow(0 0 8px rgba(89, 9, 7, 0.45))' }}
             />
           </svg>
 
@@ -238,7 +238,7 @@ export default function Hero({ onLaunchStudio }) {
             inset: 0,
             clipPath: 'url(#vortex-hero-cutout)',
             WebkitClipPath: 'url(#vortex-hero-cutout)',
-            background: 'var(--bg-burgundy-card)',
+            background: '#1A0403',
             overflow: 'hidden'
           }}>
             <video
@@ -260,13 +260,13 @@ export default function Hero({ onLaunchStudio }) {
             <div style={{
               position: 'absolute',
               inset: 0,
-              background: 'radial-gradient(circle at 75% 40%, transparent 35%, rgba(52, 4, 7, 0.6) 100%)',
+              background: 'radial-gradient(circle at 75% 40%, transparent 40%, rgba(89, 9, 7, 0.45) 100%)',
               mixBlendMode: 'multiply'
             }} />
           </div>
 
           {/* ========================================================
-              HUD OVERLAYS in Warm Ivory Cream & Deep Burgundy
+              HUD OVERLAYS in Deep Burgundy #590907 & Warm Cream Beige #E8D2B5
               ======================================================== */}
           
           {/* 1. Top-Right Broadcast Chip */}
@@ -280,26 +280,27 @@ export default function Hero({ onLaunchStudio }) {
             gap: '8px',
             padding: '7px 16px',
             borderRadius: '20px',
-            background: 'rgba(52, 4, 7, 0.85)',
+            background: 'rgba(89, 9, 7, 0.88)',
             backdropFilter: 'blur(12px)',
-            border: '1px solid var(--cream-border)',
+            border: '1px solid var(--cream-beige)',
             fontSize: '0.72rem',
             fontWeight: 800,
-            color: 'var(--cream-primary)',
+            color: 'var(--cream-beige)',
             letterSpacing: '1px',
-            textTransform: 'uppercase'
+            textTransform: 'uppercase',
+            boxShadow: '0 4px 16px rgba(89, 9, 7, 0.3)'
           }}>
             <span style={{
               width: '6px',
               height: '6px',
               borderRadius: '50%',
-              backgroundColor: '#FFF0DC',
+              backgroundColor: 'var(--cream-beige)',
               boxShadow: '0 0 8px #FFF0DC'
             }} />
             <span>OPTICAL TRACKER 74° ORBIT • 4K BROADCAST</span>
           </div>
 
-          {/* 2. Bottom-Left Extended Shelf Chips (Under text block) */}
+          {/* 2. Bottom-Left Extended Shelf Chips in Warm Cream Beige (Under text block) */}
           <div style={{
             position: 'absolute',
             bottom: '24px',
@@ -315,14 +316,15 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(52, 4, 7, 0.88)',
-              border: '1px solid var(--cream-border)',
+              background: 'var(--cream-beige)',
+              border: '1px solid rgba(89, 9, 7, 0.2)',
               fontSize: '0.75rem',
               fontWeight: 700,
-              color: 'var(--cream-secondary)'
+              color: 'var(--burgundy-deep)',
+              boxShadow: '0 2px 10px rgba(89, 9, 7, 0.15)'
             }}>
-              <span style={{ color: 'var(--cream-muted)' }}>TRACK FIX:</span>
-              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>0.8% MAE</span>
+              <span style={{ opacity: 0.75 }}>TRACK FIX:</span>
+              <span style={{ color: 'var(--burgundy-deep)', fontWeight: 800 }}>0.8% MAE</span>
             </div>
 
             <div style={{
@@ -331,14 +333,15 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(52, 4, 7, 0.88)',
-              border: '1px solid var(--cream-border)',
+              background: 'var(--cream-beige)',
+              border: '1px solid rgba(89, 9, 7, 0.2)',
               fontSize: '0.75rem',
               fontWeight: 700,
-              color: 'var(--cream-secondary)'
+              color: 'var(--burgundy-deep)',
+              boxShadow: '0 2px 10px rgba(89, 9, 7, 0.15)'
             }}>
-              <span style={{ color: 'var(--cream-muted)' }}>SPRINT:</span>
-              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>34.2 km/h</span>
+              <span style={{ opacity: 0.75 }}>SPRINT:</span>
+              <span style={{ color: 'var(--burgundy-deep)', fontWeight: 800 }}>34.2 km/h</span>
             </div>
 
             <div style={{
@@ -347,18 +350,19 @@ export default function Hero({ onLaunchStudio }) {
               gap: '6px',
               padding: '6px 14px',
               borderRadius: '16px',
-              background: 'rgba(52, 4, 7, 0.88)',
-              border: '1px solid var(--cream-border)',
+              background: 'var(--cream-beige)',
+              border: '1px solid rgba(89, 9, 7, 0.2)',
               fontSize: '0.75rem',
               fontWeight: 700,
-              color: 'var(--cream-secondary)'
+              color: 'var(--burgundy-deep)',
+              boxShadow: '0 2px 10px rgba(89, 9, 7, 0.15)'
             }}>
-              <span style={{ color: 'var(--cream-muted)' }}>GPU:</span>
-              <span style={{ color: '#FFF0DC', fontWeight: 800 }}>&lt; 16 ms</span>
+              <span style={{ opacity: 0.75 }}>GPU:</span>
+              <span style={{ color: 'var(--burgundy-deep)', fontWeight: 800 }}>&lt; 16 ms</span>
             </div>
           </div>
 
-          {/* 3. Bottom-Right Telemetry Card */}
+          {/* 3. Bottom-Right Telemetry Card in Deep Burgundy #590907 */}
           <div style={{
             position: 'absolute',
             bottom: '24px',
@@ -366,27 +370,27 @@ export default function Hero({ onLaunchStudio }) {
             zIndex: 8,
             padding: '14px 20px',
             borderRadius: '16px',
-            background: 'rgba(52, 4, 7, 0.88)',
+            background: 'rgba(89, 9, 7, 0.92)',
             backdropFilter: 'blur(16px)',
-            border: '1px solid var(--cream-border)',
-            boxShadow: '0 10px 30px rgba(0, 0, 0, 0.65)',
+            border: '1px solid var(--cream-beige)',
+            boxShadow: '0 10px 30px rgba(89, 9, 7, 0.45)',
             display: 'flex',
             alignItems: 'center',
             gap: '16px'
           }}>
-            {/* Wireframe Cylinder in Warm Ivory */}
+            {/* Wireframe Cylinder in Warm Cream Beige */}
             <div style={{
               width: '36px',
               height: '42px',
-              border: '1.5px dashed rgba(255, 240, 220, 0.65)',
+              border: '1.5px dashed var(--cream-beige)',
               borderRadius: '18px / 8px',
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: '0 0 10px rgba(255, 240, 220, 0.2)'
+              boxShadow: '0 0 10px rgba(232, 210, 181, 0.3)'
             }}>
-              <div style={{ width: '100%', height: '1px', background: 'rgba(255, 240, 220, 0.65)', margin: '4px 0' }} />
+              <div style={{ width: '100%', height: '1px', background: 'var(--cream-beige)', margin: '4px 0' }} />
             </div>
 
             <div>
@@ -396,11 +400,11 @@ export default function Hero({ onLaunchStudio }) {
                 gap: '6px',
                 fontSize: '0.7rem',
                 fontWeight: 800,
-                color: 'var(--cream-primary)',
+                color: 'var(--cream-beige)',
                 letterSpacing: '0.8px',
                 textTransform: 'uppercase'
               }}>
-                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#FFF0DC' }} />
+                <span style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: 'var(--cream-beige)' }} />
                 <span>BOB-SYS-01 • MATCH BROADCAST</span>
               </div>
 
@@ -408,16 +412,16 @@ export default function Hero({ onLaunchStudio }) {
                 fontFamily: 'Space Grotesk, sans-serif',
                 fontSize: '1.3rem',
                 fontWeight: 800,
-                color: 'var(--cream-primary)',
+                color: 'var(--cream-beige)',
                 marginTop: '3px'
               }}>
-                114.8 km/h <span style={{ opacity: 0.4, margin: '0 4px' }}>|</span> 540 RPM
+                114.8 km/h <span style={{ opacity: 0.5, margin: '0 4px' }}>|</span> 540 RPM
               </div>
 
               <div style={{
                 fontSize: '0.72rem',
                 fontWeight: 600,
-                color: 'var(--cream-muted)',
+                color: 'rgba(232, 210, 181, 0.75)',
                 marginTop: '2px'
               }}>
                 Fix: 105m × 68m FIFA Standard Pitch

@@ -22,13 +22,13 @@ export default function Navbar({ onLaunchStudio }) {
       alignItems: 'center',
       justifyContent: 'space-between',
       border: 'none',
-      borderBottom: 'none',
+      borderBottom: '1px solid rgba(89, 9, 7, 0.08)',
       boxShadow: 'none'
     }}>
-      {/* Left spacer for perfect center balance (Zero logo, Zero pitchLAB text) */}
+      {/* Left spacer for perfect center balance */}
       <div style={{ flex: 1 }} className="hidden-mobile" />
 
-      {/* Center Nav Links: Pure floating text without cylindrical pill container */}
+      {/* Center Nav Links: Deep Burgundy on Muted Sage Grey */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
@@ -41,21 +41,21 @@ export default function Navbar({ onLaunchStudio }) {
             href={link.href}
             style={{
               textDecoration: 'none',
-              color: 'var(--cream-secondary)',
+              color: 'var(--burgundy-deep)',
               fontSize: '0.92rem',
-              fontWeight: 600,
+              fontWeight: 700,
               letterSpacing: '0.3px',
-              opacity: 0.85,
+              opacity: 0.88,
               transition: 'all 0.2s ease'
             }}
             onMouseEnter={(e) => {
-              e.target.style.color = '#FFFFFF';
               e.target.style.opacity = '1';
-              e.target.style.textShadow = '0 0 12px rgba(255, 240, 220, 0.6)';
+              e.target.style.color = '#380504';
+              e.target.style.textShadow = '0 0 10px rgba(89, 9, 7, 0.2)';
             }}
             onMouseLeave={(e) => {
-              e.target.style.color = 'var(--cream-secondary)';
-              e.target.style.opacity = '0.85';
+              e.target.style.opacity = '0.88';
+              e.target.style.color = 'var(--burgundy-deep)';
               e.target.style.textShadow = 'none';
             }}
           >
@@ -64,7 +64,7 @@ export default function Navbar({ onLaunchStudio }) {
         ))}
       </div>
 
-      {/* Right Action: Clean Tactical Console Pill Button */}
+      {/* Right Action: Deep Burgundy Button with Warm Cream Beige Text */}
       <div style={{
         flex: 1,
         display: 'flex',
@@ -74,16 +74,15 @@ export default function Navbar({ onLaunchStudio }) {
       }}>
         <button
           onClick={onLaunchStudio}
-          className="btn-cream-primary"
+          className="btn-burgundy-primary"
           style={{
-            border: 'none',
             borderRadius: '24px',
             padding: '9px 24px',
             fontSize: '0.86rem'
           }}
         >
           <span>Tactical Console</span>
-          <ArrowRight size={14} color="#340407" />
+          <ArrowRight size={14} color="var(--cream-beige)" />
         </button>
 
         {/* Mobile Menu Button */}
@@ -92,7 +91,7 @@ export default function Navbar({ onLaunchStudio }) {
           style={{
             background: 'none',
             border: 'none',
-            color: 'var(--cream-primary)',
+            color: 'var(--burgundy-deep)',
             cursor: 'pointer',
             padding: '6px',
             display: 'none'
@@ -100,7 +99,7 @@ export default function Navbar({ onLaunchStudio }) {
           className="show-mobile"
           aria-label="Toggle Navigation Menu"
         >
-          {mobileMenuOpen ? <X size={24} color="#FFF0DC" /> : <Menu size={24} color="#FFF0DC" />}
+          {mobileMenuOpen ? <X size={24} color="#590907" /> : <Menu size={24} color="#590907" />}
         </button>
       </div>
 
@@ -111,12 +110,13 @@ export default function Navbar({ onLaunchStudio }) {
           top: '100%',
           left: 0,
           right: 0,
-          background: 'rgba(52, 4, 7, 0.98)',
+          background: 'rgba(165, 167, 155, 0.98)',
           backdropFilter: 'blur(20px)',
           padding: '24px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '20px'
+          gap: '20px',
+          borderBottom: '1px solid rgba(89, 9, 7, 0.15)'
         }}>
           {navLinks.map((link) => (
             <a
@@ -125,9 +125,9 @@ export default function Navbar({ onLaunchStudio }) {
               onClick={() => setMobileMenuOpen(false)}
               style={{
                 textDecoration: 'none',
-                color: 'var(--cream-primary)',
+                color: 'var(--burgundy-deep)',
                 fontSize: '1.05rem',
-                fontWeight: 600
+                fontWeight: 700
               }}
             >
               {link.label}
@@ -138,9 +138,8 @@ export default function Navbar({ onLaunchStudio }) {
               setMobileMenuOpen(false);
               onLaunchStudio();
             }}
-            className="btn-cream-primary"
+            className="btn-burgundy-primary"
             style={{
-              border: 'none',
               borderRadius: '24px',
               padding: '12px 24px',
               fontSize: '0.92rem',
@@ -148,7 +147,7 @@ export default function Navbar({ onLaunchStudio }) {
             }}
           >
             <span>Tactical Console</span>
-            <ArrowRight size={14} color="#340407" />
+            <ArrowRight size={14} color="var(--cream-beige)" />
           </button>
         </div>
       )}

@@ -46,7 +46,9 @@ class SportsDetectorTracker:
                     frame, 
                     persist=persist, 
                     tracker="bytetrack.yaml", 
-                    conf=self.conf_thresh, 
+                    conf=self.conf_thresh,
+                    classes=[self.COCO_PERSON_CLASS, self.COCO_SPORTS_BALL_CLASS],
+                    imgsz=640,
                     device=self.device,
                     verbose=False
                 )

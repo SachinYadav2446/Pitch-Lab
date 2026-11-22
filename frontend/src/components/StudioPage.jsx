@@ -13,7 +13,7 @@ export default function StudioPage({ onBackToHome }) {
 
   // Upload & Configuration State
   const [selectedFile, setSelectedFile] = useState(null);
-  const [maxFrames, setMaxFrames] = useState(120);
+  const [maxFrames, setMaxFrames] = useState(45);
   const [isDragOver, setIsDragOver] = useState(false);
   const [backendOnline, setBackendOnline] = useState(false);
 
@@ -187,12 +187,19 @@ export default function StudioPage({ onBackToHome }) {
   // Find telemetry frame closest to timestamp
   const getFrameForTime = useCallback((timeSec) => {
     if (!telemetryFrames || telemetryFrames.length === 0) return null;
-    const fps = 30;
-    const targetIdx = Math.min(
-      telemetryFrames.length - 1,
-      Math.max(0, Math.floor(timeSec * fps))
-    );
-    return telemetryFrames[targetIdx];
+    let closestFrame = telemetryFrames[0];
+    let minDiff = Infinity;
+    for (let i = 0; i < telemetryFrames.length; i++) {
+      const t = telemetryFrames[i].time ?? (i / 15);
+      const diff = Math.abs(t - timeSec);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestFrame = telemetryFrames[i];
+      } else {
+        break;
+      }
+    }
+    return closestFrame;
   }, [telemetryFrames]);
 
   // Video playback callbacks
@@ -275,21 +282,22 @@ export default function StudioPage({ onBackToHome }) {
       const dt = (timestamp - lastTimestamp) / 1000;
       lastTimestamp = timestamp;
 
-      if (isPlaying) {
-        setCurrentTime(prev => {
-          const next = prev + dt * playbackRate;
-          return next > (duration || 6.0) ? 0 : next;
-        });
+      let timeSec = currentTime;
+      if (videoRef.current && !videoRef.current.paused) {
+        timeSec = videoRef.current.currentTime;
+      } else if (isPlaying) {
+        timeSec = (currentTime + dt * playbackRate) % (duration || 6.0);
+        setCurrentTime(timeSec);
       }
 
       radarSweepAngleRef.current = (radarSweepAngleRef.current + dt * 2.2) % (Math.PI * 2);
       scanLineYRef.current = (scanLineYRef.current + dt * 180) % 720;
 
-      const frameData = getFrameForTime(currentTime);
+      const frameData = getFrameForTime(timeSec);
       if (frameData) {
         setCurrentFrameData(frameData);
-        if (frameData.ball) {
-          ballHistoryRef.current.push({ ...frameData.ball, time: currentTime });
+        if (frameData.ball && frameData.ball.pitch_x != null) {
+          ballHistoryRef.current.push({ ...frameData.ball, time: timeSec });
           if (ballHistoryRef.current.length > 25) ballHistoryRef.current.shift();
         }
       }
@@ -342,9 +350,34 @@ export default function StudioPage({ onBackToHome }) {
 
       // Players on broadcast feed
       if (frameData && frameData.players) {
+        const vidW = videoRef.current?.videoWidth || 1280;
+        const vidH = videoRef.current?.videoHeight || 720;
+        const sx = bw / vidW;
+        const sy = bh / vidH;
+
         frameData.players.forEach(p => {
-          const px = ((p.pitch_x || 50) / 105) * (bw - 160) + 80;
-          const py = ((p.pitch_y || 34) / 68) * (bh - 140) + 70;
+          let bx1, by1, bx2, by2, px, py, boxW, boxH;
+
+          if (p.bbox && p.bbox.length === 4 && p.bbox[2] > p.bbox[0]) {
+            bx1 = p.bbox[0] * sx;
+            by1 = p.bbox[1] * sy;
+            bx2 = p.bbox[2] * sx;
+            by2 = p.bbox[3] * sy;
+            boxW = Math.max(16, bx2 - bx1);
+            boxH = Math.max(24, by2 - by1);
+            px = (bx1 + bx2) / 2;
+            py = by2;
+          } else {
+            px = ((p.pitch_x || 50) / 105) * (bw - 160) + 80;
+            py = ((p.pitch_y || 34) / 68) * (bh - 140) + 70;
+            boxW = 32;
+            boxH = 54;
+            bx1 = px - boxW / 2;
+            by1 = py - boxH + 18;
+            bx2 = bx1 + boxW;
+            by2 = by1 + boxH;
+          }
+
           const isAlpha = p.team === 'alpha';
           const isSelected = p.id === selectedPlayerId;
           const primaryColor = isAlpha ? '#D90429' : '#1D3557';
@@ -353,7 +386,7 @@ export default function StudioPage({ onBackToHome }) {
           if (showRings) {
             bCtx.save();
             bCtx.beginPath();
-            bCtx.ellipse(px, py + 18, 22, 10, 0, 0, Math.PI * 2);
+            bCtx.ellipse(px, py, Math.max(14, boxW * 0.5), Math.max(6, boxW * 0.22), 0, 0, Math.PI * 2);
             bCtx.strokeStyle = isSelected ? '#FFF6EB' : primaryColor;
             bCtx.lineWidth = isSelected ? 3 : 2;
             bCtx.stroke();
@@ -362,31 +395,28 @@ export default function StudioPage({ onBackToHome }) {
 
           // Bounding box
           if (showBoxes) {
-            const boxW = 32;
-            const boxH = 54;
-            const bx = px - boxW / 2;
-            const by = py - boxH + 18;
-
             bCtx.strokeStyle = isSelected ? '#FFF6EB' : primaryColor;
             bCtx.lineWidth = isSelected ? 2.5 : 1.5;
-            bCtx.strokeRect(bx, by, boxW, boxH);
+            bCtx.strokeRect(bx1, by1, boxW, boxH);
 
             bCtx.fillStyle = 'rgba(20, 3, 3, 0.85)';
-            bCtx.fillRect(bx - 4, by - 16, boxW + 8, 14);
+            const labelText = `#${p.id} ${p.speed_kmh || 0}k`;
+            bCtx.font = '700 9px monospace';
+            const textW = bCtx.measureText(labelText).width;
+            bCtx.fillRect(bx1 - 2, by1 - 15, Math.max(textW + 8, 38), 13);
 
             bCtx.fillStyle = '#FFF6EB';
-            bCtx.font = '700 9px monospace';
-            bCtx.fillText(`#${p.id} ${p.speed_kmh || 0}k`, bx - 2, by - 6);
+            bCtx.fillText(labelText, bx1 + 2, by1 - 5);
           }
 
           // Velocity heading vector
-          if (showVectors && (p.speed_kmh || 0) > 10) {
-            const headingRad = isAlpha ? 0.3 : Math.PI - 0.3;
-            const vectorLen = Math.min(35, (p.speed_kmh || 0) * 1.2);
+          if (showVectors && (p.speed_kmh || 0) > 8) {
+            const headingRad = isAlpha ? 0.25 : Math.PI - 0.25;
+            const vectorLen = Math.min(32, (p.speed_kmh || 0) * 1.1);
             bCtx.beginPath();
-            bCtx.moveTo(px, py + 18);
-            bCtx.lineTo(px + Math.cos(headingRad) * vectorLen, py + 18 + Math.sin(headingRad) * vectorLen * 0.5);
-            bCtx.strokeStyle = 'rgba(232, 210, 181, 0.8)';
+            bCtx.moveTo(px, py);
+            bCtx.lineTo(px + Math.cos(headingRad) * vectorLen, py + Math.sin(headingRad) * vectorLen * 0.5);
+            bCtx.strokeStyle = 'rgba(232, 210, 181, 0.85)';
             bCtx.lineWidth = 2;
             bCtx.stroke();
           }
@@ -767,10 +797,9 @@ export default function StudioPage({ onBackToHome }) {
                         fontSize: '0.74rem'
                       }}
                     >
-                      <option value={60}>60 Frames (~2 sec / Fast)</option>
-                      <option value={120}>120 Frames (~4 sec / Standard)</option>
-                      <option value={180}>180 Frames (~6 sec)</option>
-                      <option value={300}>300 Frames (~10 sec)</option>
+                      <option value={45}>45 Frames (~3 sec / Fast CPU ~15s)</option>
+                      <option value={90}>90 Frames (~6 sec / Standard)</option>
+                      <option value={150}>150 Frames (~10 sec / Extended)</option>
                     </select>
                   </label>
                 </div>

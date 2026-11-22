@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600" width="1000" height="600">
+  <rect width="1000" height="600" fill="#111" />
+  <path d="
+    M 480 50
+    A 50 50 0 0 1 530 0
+    L 950 0
+    A 50 50 0 0 1 1000 50
+    L 1000 550
+    A 50 50 0 0 1 950 600
+    L 50 600
+    A 50 50 0 0 1 0 550
+    L 0 400
+    A 50 50 0 0 1 50 350
+    L 430 350
+    A 50 50 0 0 0 480 300
+    L 480 50
+    Z
+  " fill="#790B13" stroke="#FFF0DC" stroke-width="3" />
+</svg>

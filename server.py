@@ -113,33 +113,26 @@ def process_video_task(job_id: str, video_path: str, max_frames: int, conf_thres
             # Extract structured telemetry for this frame
             timestamp_sec = round(frame_idx / fps, 3)
             
-            # Extract player tracking records
+            # Extract actual players detected in this frame
+            frame_players = frame_res.get("players", [])
             current_players = []
-            if pipeline.tracker and hasattr(pipeline.tracker, 'process_frame'):
-                # Collect from radar players for metric pitch data
-                if hasattr(pipeline, 'homography') and pipeline.metrics:
-                    # Collect players from last tracker output
-                    for pid, speed in pipeline.metrics.current_speeds.items():
-                        if pid == -1:
-                            continue
-                        # Get latest position
-                        hist = pipeline.metrics.position_history.get(pid)
-                        if hist and len(hist) > 0:
-                            _, px, py = hist[-1]
-                            current_players.append({
-                                "id": pid,
-                                "team": "alpha" if (pid % 2 == 0) else "beta",
-                                "pitch_x": round(float(px), 2),
-                                "pitch_y": round(float(py), 2),
-                                "speed_kmh": round(float(speed), 1)
-                            })
-            
+            for p in frame_players:
+                current_players.append({
+                    "id": p["id"],
+                    "team": p.get("team", "alpha"),
+                    "pitch_x": round(float(p.get("pitch_x", 50.0)), 2),
+                    "pitch_y": round(float(p.get("pitch_y", 34.0)), 2),
+                    "speed_kmh": round(float(p.get("speed_kmh", 0.0)), 1),
+                    "bbox": [round(float(c), 1) for c in p.get("bbox", [0, 0, 0, 0])]
+                })
+
             telemetry_frames.append({
                 "time": timestamp_sec,
                 "frame": frame_idx,
                 "players": current_players,
+                "ball": frame_res.get("ball"),
                 "possession": frame_res.get("possession", {0: 50.0, 1: 50.0}),
-                "num_players": frame_res.get("num_players", len(current_players)),
+                "num_players": len(current_players),
                 "ball_detected": frame_res.get("ball_detected", False)
             })
             

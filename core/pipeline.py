@@ -29,6 +29,9 @@ class MatchAnalyticsPipeline:
         Processes one video frame and returns composite visualization + frame metrics.
         """
         h, w, _ = frame.shape
+        if not hasattr(self, '_calibrated_res') or self._calibrated_res != (w, h):
+            self.homography.setup_default_calibration(frame_w=w, frame_h=h)
+            self._calibrated_res = (w, h)
         
         # 1. Detect & Track
         track_results = self.tracker.process_frame(frame)
@@ -36,7 +39,7 @@ class MatchAnalyticsPipeline:
         ball_info = track_results['ball']
 
         # 2. Team Classification Initialization (fit on early frame with sufficient players)
-        if not self.teams_initialized and len(raw_players) >= 8:
+        if not self.teams_initialized and len(raw_players) >= 6:
             bboxes = [p['bbox'] for p in raw_players]
             self.team_classifier.fit_teams(frame, bboxes)
             self.teams_initialized = True
@@ -61,11 +64,16 @@ class MatchAnalyticsPipeline:
             if self.metrics:
                 speed_kmh = self.metrics.update_player_position(frame_idx, p_id, (pitch_x, pitch_y))
 
-            # Store for radar rendering
+            # Store for radar rendering and client telemetry
             radar_players.append({
                 'id': p_id,
-                'team': team_id,
+                'team': 'alpha' if team_id == 0 else 'beta',
+                'team_id': team_id,
                 'pos': (pitch_x, pitch_y),
+                'pitch_x': pitch_x,
+                'pitch_y': pitch_y,
+                'speed_kmh': speed_kmh,
+                'bbox': bbox,
                 'color': team_color
             })
 
@@ -75,12 +83,18 @@ class MatchAnalyticsPipeline:
 
         # 4. Process Ball
         radar_ball = None
+        ball_telemetry = None
         if ball_info:
             b_box = ball_info['bbox']
             bx_center = (b_box[0] + b_box[2]) / 2.0
             by_center = (b_box[1] + b_box[3]) / 2.0
             pitch_bx, pitch_by = self.homography.transform_point(bx_center, by_center)
             radar_ball = (pitch_bx, pitch_by)
+            ball_telemetry = {
+                'bbox': b_box,
+                'pitch_x': pitch_bx,
+                'pitch_y': pitch_by
+            }
             self.annotator.draw_ball_pointer(annotated_frame, b_box)
 
         # 5. Update Possession
@@ -103,6 +117,8 @@ class MatchAnalyticsPipeline:
             'annotated_frame': annotated_frame,
             'radar_img': radar_img,
             'possession': possession,
+            'players': radar_players,
+            'ball': ball_telemetry,
             'num_players': len(radar_players),
             'ball_detected': radar_ball is not None
         }

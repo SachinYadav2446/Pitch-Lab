@@ -529,6 +529,33 @@ export default function StudioPage({ onBackToHome }) {
       rCtx.fill();
       rCtx.restore();
 
+      // Camera Viewport Frustum (showing which area of the pitch the TV camera is viewing)
+      rCtx.save();
+      rCtx.beginPath();
+      const fovTL = { x: toRadarX(22.0), y: toRadarY(6.0) };
+      const fovTR = { x: toRadarX(64.0), y: toRadarY(6.0) };
+      const fovBR = { x: toRadarX(68.0), y: toRadarY(64.0) };
+      const fovBL = { x: toRadarX(18.0), y: toRadarY(64.0) };
+
+      rCtx.moveTo(fovTL.x, fovTL.y);
+      rCtx.lineTo(fovTR.x, fovTR.y);
+      rCtx.lineTo(fovBR.x, fovBR.y);
+      rCtx.lineTo(fovBL.x, fovBL.y);
+      rCtx.closePath();
+
+      rCtx.fillStyle = 'rgba(232, 210, 181, 0.08)';
+      rCtx.fill();
+      rCtx.setLineDash([4, 4]);
+      rCtx.strokeStyle = 'rgba(232, 210, 181, 0.4)';
+      rCtx.lineWidth = 1.2;
+      rCtx.stroke();
+      rCtx.setLineDash([]);
+
+      rCtx.fillStyle = 'rgba(232, 210, 181, 0.65)';
+      rCtx.font = '700 8px monospace';
+      rCtx.fillText('CAMERA FOV', fovTL.x + 4, fovTL.y + 11);
+      rCtx.restore();
+
       // Render players on radar
       if (frameData && frameData.players) {
         frameData.players.forEach(p => {
@@ -1180,7 +1207,16 @@ export default function StudioPage({ onBackToHome }) {
                   ref={broadcastCanvasRef}
                   width={1280}
                   height={720}
-                  style={{ width: '100%', height: '100%', display: 'block' }}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: '100%',
+                    height: '100%',
+                    display: 'block',
+                    pointerEvents: 'none',
+                    zIndex: 5
+                  }}
                 />
 
                 {/* Top-Right HUD Badge */}

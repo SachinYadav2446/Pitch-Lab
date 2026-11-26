@@ -22,20 +22,21 @@ class PitchHomography:
         Creates a reasonable initial homography transformation for typical main broadcast football angles.
         Maps the visible field trapezoid in the camera view to standard pitch dimensions.
         """
-        # Estimated field corner locations in a typical broadcast 1080p frame
+        # Estimated field corner locations in broadcast frame (16:9 aspect)
         src = np.array([
-            [int(frame_w * 0.15), int(frame_h * 0.25)],  # Top-left of visible field
-            [int(frame_w * 0.85), int(frame_h * 0.25)],  # Top-right of visible field
-            [int(frame_w * 0.98), int(frame_h * 0.95)],  # Bottom-right
-            [int(frame_w * 0.02), int(frame_h * 0.95)]   # Bottom-left
+            [int(frame_w * 0.12), int(frame_h * 0.22)],  # Top-left of visible field
+            [int(frame_w * 0.88), int(frame_h * 0.22)],  # Top-right of visible field
+            [int(frame_w * 0.98), int(frame_h * 0.95)],  # Bottom-right near camera
+            [int(frame_w * 0.02), int(frame_h * 0.95)]   # Bottom-left near camera
         ], dtype=np.float32)
 
-        # Corresponding 2D pitch coordinates (in meters)
+        # Corresponding 2D pitch coordinates for broadcast tactical angle (in meters)
+        # Standard broadcast camera covers roughly a 45m section of the 105m pitch
         dst = np.array([
-            [15.0, 5.0],    # X=15m, Y=5m
-            [90.0, 5.0],    # X=90m, Y=5m
-            [95.0, 63.0],   # X=95m, Y=63m
-            [10.0, 63.0]    # X=10m, Y=63m
+            [22.0, 6.0],    # X=22m (near 18-yd line), Y=6m (far touchline)
+            [64.0, 6.0],    # X=64m (past center line), Y=6m (far touchline)
+            [68.0, 64.0],   # X=68m, Y=64m (near touchline)
+            [18.0, 64.0]    # X=18m, Y=64m (near touchline)
         ], dtype=np.float32)
 
         self.set_keypoints(src, dst)

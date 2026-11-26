@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { 
   Play, Pause, RotateCcw, Upload, ArrowLeft, Activity, 
   Radio, Cpu, Download, FileSpreadsheet, Zap, CheckCircle2, 
-  AlertCircle, RefreshCw, Compass, FileVideo, Check
+  AlertCircle, RefreshCw, Compass, FileVideo, Check, AlertTriangle, ShieldCheck
 } from 'lucide-react';
 
 const API_BASE = 'http://localhost:8001';
@@ -529,13 +529,18 @@ export default function StudioPage({ onBackToHome }) {
       rCtx.fill();
       rCtx.restore();
 
-      // Camera Viewport Frustum (showing which area of the pitch the TV camera is viewing)
+      // Dynamic Camera Viewport Frustum from Neural Pipeline
+      const frustum = frameData?.camera_frustum || [
+        [22.0, 6.0], [64.0, 6.0], [68.0, 64.0], [18.0, 64.0]
+      ];
+      const isTactical = frameData?.shot_info?.is_tactical !== false;
+
       rCtx.save();
       rCtx.beginPath();
-      const fovTL = { x: toRadarX(22.0), y: toRadarY(6.0) };
-      const fovTR = { x: toRadarX(64.0), y: toRadarY(6.0) };
-      const fovBR = { x: toRadarX(68.0), y: toRadarY(64.0) };
-      const fovBL = { x: toRadarX(18.0), y: toRadarY(64.0) };
+      const fovTL = { x: toRadarX(frustum[0][0]), y: toRadarY(frustum[0][1]) };
+      const fovTR = { x: toRadarX(frustum[1][0]), y: toRadarY(frustum[1][1]) };
+      const fovBR = { x: toRadarX(frustum[2][0]), y: toRadarY(frustum[2][1]) };
+      const fovBL = { x: toRadarX(frustum[3][0]), y: toRadarY(frustum[3][1]) };
 
       rCtx.moveTo(fovTL.x, fovTL.y);
       rCtx.lineTo(fovTR.x, fovTR.y);
@@ -543,21 +548,21 @@ export default function StudioPage({ onBackToHome }) {
       rCtx.lineTo(fovBL.x, fovBL.y);
       rCtx.closePath();
 
-      rCtx.fillStyle = 'rgba(232, 210, 181, 0.08)';
+      rCtx.fillStyle = isTactical ? 'rgba(232, 210, 181, 0.08)' : 'rgba(245, 158, 11, 0.08)';
       rCtx.fill();
       rCtx.setLineDash([4, 4]);
-      rCtx.strokeStyle = 'rgba(232, 210, 181, 0.4)';
-      rCtx.lineWidth = 1.2;
+      rCtx.strokeStyle = isTactical ? 'rgba(232, 210, 181, 0.55)' : 'rgba(245, 158, 11, 0.65)';
+      rCtx.lineWidth = 1.4;
       rCtx.stroke();
       rCtx.setLineDash([]);
 
-      rCtx.fillStyle = 'rgba(232, 210, 181, 0.65)';
-      rCtx.font = '700 8px monospace';
-      rCtx.fillText('CAMERA FOV', fovTL.x + 4, fovTL.y + 11);
+      rCtx.fillStyle = isTactical ? 'rgba(232, 210, 181, 0.85)' : '#F59E0B';
+      rCtx.font = '700 8.5px monospace';
+      rCtx.fillText(isTactical ? '● CAMERA FOV' : '⏸ CLOSE-UP (PAUSED)', fovTL.x + 4, fovTL.y + 11);
       rCtx.restore();
 
-      // Render players on radar
-      if (frameData && frameData.players) {
+      // Render players on radar (only when tactical view is active)
+      if (isTactical && frameData && frameData.players) {
         frameData.players.forEach(p => {
           const rx = toRadarX(p.pitch_x || 50);
           const ry = toRadarY(p.pitch_y || 34);
@@ -1008,6 +1013,29 @@ export default function StudioPage({ onBackToHome }) {
             </div>
           </div>
 
+          {/* Tactical Sequence Specification Card */}
+          <div style={{
+            marginTop: '20px',
+            backgroundColor: 'rgba(232, 210, 181, 0.14)',
+            border: '1px solid rgba(232, 210, 181, 0.35)',
+            borderRadius: '6px',
+            padding: '14px 18px',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '12px',
+            color: '#300403'
+          }}>
+            <ShieldCheck size={20} color="var(--burgundy-deep)" style={{ flexShrink: 0, marginTop: '2px' }} />
+            <div style={{ fontSize: '0.78rem', lineHeight: 1.5 }}>
+              <strong style={{ color: 'var(--burgundy-deep)', fontSize: '0.82rem' }}>
+                Engineered for Tactical Match Sequences:
+              </strong>
+              <span style={{ display: 'block', color: '#4A0604', opacity: 0.9, marginTop: '2px' }}>
+                Optimized for elevated broadcast footage (counter-attacks, positional shape, pressing phases). Our neural Shot Gatekeeper automatically validates wide tactical views and handles camera pans and close-ups cleanly.
+              </span>
+            </div>
+          </div>
+
           {/* Error Message Box */}
           {errorMessage && (
             <div style={{
@@ -1219,6 +1247,31 @@ export default function StudioPage({ onBackToHome }) {
                   }}
                 />
 
+                {/* Shot Gatekeeper Warning Alert (if close-up or replay cut) */}
+                {currentFrameData?.shot_info?.is_tactical === false && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '14px',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    backgroundColor: 'rgba(245, 158, 11, 0.95)',
+                    color: '#1E0201',
+                    padding: '5px 14px',
+                    borderRadius: '4px',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    boxShadow: '0 4px 14px rgba(0,0,0,0.4)',
+                    zIndex: 10,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}>
+                    <AlertTriangle size={13} color="#1E0201" />
+                    <span>{currentFrameData?.shot_info?.label || 'CLOSE-UP / REACTION DETECTED — 2D RADAR PAUSED'}</span>
+                  </div>
+                )}
+
                 {/* Top-Right HUD Badge */}
                 <div style={{
                   position: 'absolute',
@@ -1234,8 +1287,19 @@ export default function StudioPage({ onBackToHome }) {
                   fontSize: '0.70rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '8px',
+                  zIndex: 10
                 }}>
+                  <span style={{ 
+                    display: 'inline-flex', 
+                    alignItems: 'center', 
+                    gap: '5px',
+                    color: currentFrameData?.shot_info?.is_tactical !== false ? '#4ADE80' : '#F59E0B',
+                    fontWeight: 700 
+                  }}>
+                    ● {currentFrameData?.shot_info?.is_tactical !== false ? 'TACTICAL FEED' : 'CLOSE-UP'}
+                  </span>
+                  <span style={{ opacity: 0.4 }}>|</span>
                   <Cpu size={12} color="#E8D2B5" />
                   <span>YOLOv8x-MOT</span>
                   <span style={{ opacity: 0.4 }}>|</span>

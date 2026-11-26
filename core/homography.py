@@ -71,7 +71,7 @@ class PitchHomography:
         pitch_y = float(np.clip(transformed[1], 0.0, self.PITCH_WIDTH))
         return pitch_x, pitch_y
 
-    def get_player_foot_position(self, bbox: list) -> tuple:
+    def get_player_foot_position(self, bbox: list, pan_offset_x: float = 0.0) -> tuple:
         """
         Given a player bounding box [x1, y1, x2, y2], returns the bottom-center point
         which represents the contact point with the pitch ground.
@@ -79,4 +79,27 @@ class PitchHomography:
         x1, y1, x2, y2 = bbox
         foot_x = (x1 + x2) / 2.0
         foot_y = float(y2)
-        return self.transform_point(foot_x, foot_y)
+        px, py = self.transform_point(foot_x, foot_y)
+        if pan_offset_x != 0.0:
+            px = float(np.clip(px + pan_offset_x, 0.0, self.PITCH_LENGTH))
+        return px, py
+
+    def get_camera_frustum(self, frame_w: int, frame_h: int, pan_offset_x: float = 0.0) -> list:
+        """
+        Calculates the 4 metric pitch coordinates (meters) representing the 
+        ground area currently visible within the camera's field of view.
+        Returns: [[x_tl, y_tl], [x_tr, y_tr], [x_br, y_br], [x_bl, y_bl]]
+        """
+        pts_pixel = [
+            (frame_w * 0.06, frame_h * 0.20),  # Top-left (far touchline)
+            (frame_w * 0.94, frame_h * 0.20),  # Top-right (far touchline)
+            (frame_w * 0.98, frame_h * 0.96),  # Bottom-right (near touchline)
+            (frame_w * 0.02, frame_h * 0.96)   # Bottom-left (near touchline)
+        ]
+        frustum = []
+        for px, py in pts_pixel:
+            mx, my = self.transform_point(px, py)
+            mx = float(np.clip(mx + pan_offset_x, 0.0, self.PITCH_LENGTH))
+            my = float(np.clip(my, 0.0, self.PITCH_WIDTH))
+            frustum.append([round(mx, 2), round(my, 2)])
+        return frustum

@@ -133,7 +133,13 @@ def process_video_task(job_id: str, video_path: str, max_frames: int, conf_thres
                 "ball": frame_res.get("ball"),
                 "possession": frame_res.get("possession", {0: 50.0, 1: 50.0}),
                 "num_players": len(current_players),
-                "ball_detected": frame_res.get("ball_detected", False)
+                "ball_detected": frame_res.get("ball_detected", False),
+                "shot_info": frame_res.get("shot_info", {
+                    "shot_type": "tactical",
+                    "is_tactical": True,
+                    "label": "TACTICAL BROADCAST FEED (VALIDATED)"
+                }),
+                "camera_frustum": frame_res.get("camera_frustum")
             })
             
             frame_idx += 1
